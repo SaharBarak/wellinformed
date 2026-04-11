@@ -4,439 +4,554 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>wellinformed — persistent research memory for AI agents</title>
-  <meta name="description" content="MCP-native skill for Claude Code, Codex, and OpenClaw. Knowledge graph + embeddings + live source fetching. Your agent stops guessing and starts citing." />
-  <meta property="og:title" content="wellinformed" />
-  <meta property="og:description" content="Persistent research memory for AI coding agents. 11 MCP tools. ArXiv, HN, RSS, codebase indexing." />
-  <meta property="og:type" content="website" />
+  <meta name="description" content="MCP-native skill for Claude Code, Codex, OpenClaw. Knowledge graph + embeddings. Your agent stops guessing." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --accent: #10b981;
-      --accent-dim: #10b98133;
-      --bg: #09090b;
-      --bg-elevated: #18181b;
-      --bg-subtle: #27272a;
-      --text: #fafafa;
-      --text-secondary: #a1a1aa;
-      --text-muted: #71717a;
-      --border: #27272a;
-      --max-w: 1200px;
-      --font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      --mono: 'JetBrains Mono', 'SF Mono', monospace;
+      --bg: #1a1a2e;
+      --bg-dark: #0f0f23;
+      --bg-card: #16213e;
+      --accent-green: #00d26a;
+      --accent-blue: #00b4d8;
+      --accent-purple: #9b5de5;
+      --accent-orange: #ff9e00;
+      --accent-pink: #f72585;
+      --accent-yellow: #ffd60a;
+      --text: #e0e0e0;
+      --text-dim: #8892b0;
+      --text-bright: #ffffff;
+      --border: #233554;
+      --font-pixel: 'Press Start 2P', monospace;
+      --font-body: 'Inter', -apple-system, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
     }
 
     body {
-      background: var(--bg);
+      background: var(--bg-dark);
       color: var(--text);
-      font-family: var(--font);
-      font-size: 16px;
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
+      font-family: var(--font-body);
+      overflow-x: hidden;
     }
 
-    /* --- Hero: split layout, left-aligned (anti-center bias) --- */
+    /* --- Pixel grid background --- */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(0,180,216,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,180,216,0.03) 1px, transparent 1px);
+      background-size: 32px 32px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* --- Sprite animation --- */
+    .welly-sprite {
+      width: 256px;
+      height: 256px;
+      background: url('welly-idle.png') 0 0;
+      background-size: 1280px 1280px;
+      animation: idle 2s steps(1) infinite;
+      image-rendering: pixelated;
+    }
+
+    @keyframes idle {
+      0%    { background-position: 0 0; }
+      4%    { background-position: -256px 0; }
+      8%    { background-position: -512px 0; }
+      12%   { background-position: -768px 0; }
+      16%   { background-position: -1024px 0; }
+      20%   { background-position: 0 -256px; }
+      24%   { background-position: -256px -256px; }
+      28%   { background-position: -512px -256px; }
+      32%   { background-position: -768px -256px; }
+      36%   { background-position: -1024px -256px; }
+      40%   { background-position: 0 -512px; }
+      44%   { background-position: -256px -512px; }
+      48%   { background-position: -512px -512px; }
+      52%   { background-position: -768px -512px; }
+      56%   { background-position: -1024px -512px; }
+      60%   { background-position: 0 -768px; }
+      64%   { background-position: -256px -768px; }
+      68%   { background-position: -512px -768px; }
+      72%   { background-position: -768px -768px; }
+      76%   { background-position: -1024px -768px; }
+      80%   { background-position: 0 -1024px; }
+      84%   { background-position: -256px -1024px; }
+      88%   { background-position: -512px -1024px; }
+      92%   { background-position: -768px -1024px; }
+      96%   { background-position: -1024px -1024px; }
+    }
+
+    /* --- Hero --- */
     .hero {
       min-height: 100dvh;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 4rem;
+      gap: 2rem;
       align-items: center;
-      max-width: var(--max-w);
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 2rem 2rem;
+      padding: 2rem;
+      position: relative;
+      z-index: 1;
     }
 
     @media (max-width: 768px) {
-      .hero { grid-template-columns: 1fr; min-height: auto; padding: 4rem 1.5rem 2rem; }
+      .hero { grid-template-columns: 1fr; text-align: center; }
+      .hero-right { justify-self: center; }
     }
 
-    .hero-left h1 {
-      font-size: clamp(2.5rem, 5vw, 3.75rem);
-      font-weight: 700;
-      letter-spacing: -0.03em;
-      line-height: 1.05;
+    .hero h1 {
+      font-family: var(--font-pixel);
+      font-size: clamp(1rem, 2.5vw, 1.5rem);
+      line-height: 2;
+      color: var(--accent-green);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 20px rgba(0,210,106,0.3);
+    }
+
+    .hero p {
+      font-size: 1.0625rem;
+      color: var(--text-dim);
+      line-height: 1.8;
+      max-width: 480px;
       margin-bottom: 1.5rem;
     }
 
-    .hero-left h1 span { color: var(--accent); }
-
-    .hero-left p {
-      font-size: 1.125rem;
-      color: var(--text-secondary);
-      max-width: 500px;
-      line-height: 1.7;
-      margin-bottom: 2rem;
-    }
-
-    .hero-cta {
-      display: inline-flex;
-      gap: 1rem;
+    .social-badges {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 1.5rem;
       flex-wrap: wrap;
     }
+
+    @media (max-width: 768px) { .social-badges { justify-content: center; } }
+
+    .hero-btns {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 768px) { .hero-btns { justify-content: center; } }
 
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      font-size: 0.9375rem;
-      font-weight: 500;
+      padding: 0.625rem 1.25rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      font-weight: 600;
       text-decoration: none;
-      transition: transform 0.15s, box-shadow 0.15s;
-      cursor: pointer;
       border: none;
+      cursor: pointer;
+      transition: transform 0.1s, box-shadow 0.2s;
     }
 
-    .btn:active { transform: scale(0.98) translateY(1px); }
+    .btn:active { transform: scale(0.97); }
+    .btn-green { background: var(--accent-green); color: var(--bg-dark); }
+    .btn-green:hover { box-shadow: 0 0 16px rgba(0,210,106,0.4); }
+    .btn-outline { background: transparent; color: var(--text); border: 1px solid var(--border); }
+    .btn-outline:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
 
-    .btn-primary {
-      background: var(--accent);
-      color: var(--bg);
-    }
-
-    .btn-primary:hover { box-shadow: 0 0 0 4px var(--accent-dim); }
-
-    .btn-secondary {
-      background: var(--bg-elevated);
-      color: var(--text);
+    /* --- Stat bar (RPG-style) --- */
+    .stat-bar {
+      background: var(--bg-card);
       border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      margin-top: 1.5rem;
     }
 
-    .btn-secondary:hover { border-color: var(--text-muted); }
+    .stat-bar h3 {
+      font-family: var(--font-pixel);
+      font-size: 0.5rem;
+      color: var(--accent-yellow);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+    }
 
-    /* --- Terminal mockup (right side of hero) --- */
-    .terminal {
-      background: var(--bg-elevated);
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-family: var(--font-mono);
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .stat-label {
+      font-size: 0.6875rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 2px;
+    }
+
+    .c-green { color: var(--accent-green); }
+    .c-blue { color: var(--accent-blue); }
+    .c-purple { color: var(--accent-purple); }
+    .c-orange { color: var(--accent-orange); }
+    .c-pink { color: var(--accent-pink); }
+    .c-yellow { color: var(--accent-yellow); }
+
+    /* --- Sections --- */
+    section {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 5rem 2rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-title {
+      font-family: var(--font-pixel);
+      font-size: 0.75rem;
+      color: var(--accent-blue);
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 0.75rem;
+    }
+
+    section h2 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    section > p {
+      color: var(--text-dim);
+      max-width: 60ch;
+      margin-bottom: 2.5rem;
+    }
+
+    /* --- Quest log (feature list) --- */
+    .quests {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+    }
+
+    .quest {
+      background: var(--bg-card);
       border: 1px solid var(--border);
-      border-radius: 12px;
-      overflow: hidden;
-      font-family: var(--mono);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      transition: border-color 0.2s, transform 0.15s;
+    }
+
+    .quest:hover { border-color: var(--accent-blue); transform: translateY(-2px); }
+
+    .quest-tag {
+      font-family: var(--font-pixel);
+      font-size: 0.4375rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 0.625rem;
+      display: inline-block;
+    }
+
+    .quest h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.375rem;
+    }
+
+    .quest p {
       font-size: 0.8125rem;
-      line-height: 1.7;
+      color: var(--text-dim);
+      line-height: 1.6;
+    }
+
+    /* --- MCP tools (terminal-style) --- */
+    .terminal {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
     }
 
     .terminal-bar {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 12px 16px;
-      background: var(--bg-subtle);
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.3);
       border-bottom: 1px solid var(--border);
     }
 
-    .terminal-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--bg-subtle);
-      border: 1px solid var(--text-muted);
-    }
+    .terminal-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .td-red { background: var(--accent-pink); }
+    .td-yellow { background: var(--accent-yellow); }
+    .td-green { background: var(--accent-green); }
 
-    .terminal-body { padding: 1rem 1.25rem; }
-    .terminal-body .prompt { color: var(--accent); }
-    .terminal-body .cmd { color: var(--text); }
-    .terminal-body .output { color: var(--text-muted); }
-    .terminal-body .highlight { color: var(--accent); }
-
-    /* --- Sections --- */
-    section {
-      max-width: var(--max-w);
-      margin: 0 auto;
-      padding: 6rem 2rem;
-    }
-
-    @media (max-width: 768px) { section { padding: 3rem 1.5rem; } }
-
-    section h2 {
-      font-size: 2rem;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      margin-bottom: 0.75rem;
-    }
-
-    section > p {
-      color: var(--text-secondary);
-      max-width: 65ch;
-      margin-bottom: 3rem;
-    }
-
-    /* --- Feature grid: border-based grouping, no cards (Rule 4) --- */
-    .features {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 0;
-    }
-
-    .feature {
-      padding: 2rem 1.5rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .feature:nth-child(-n+3) { border-top: none; }
-    @media (max-width: 640px) { .feature:nth-child(n+2) { border-top: 1px solid var(--border); } .feature:first-child { border-top: none; } }
-
-    .feature h3 {
-      font-size: 1rem;
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-      color: var(--text);
-    }
-
-    .feature p {
-      font-size: 0.875rem;
-      color: var(--text-muted);
-      line-height: 1.6;
-    }
-
-    .feature .tag {
-      display: inline-block;
-      font-size: 0.6875rem;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--accent);
-      margin-bottom: 0.75rem;
-    }
-
-    /* --- Tools table --- */
-    .tools-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.875rem;
-    }
-
-    .tools-table th {
-      text-align: left;
-      font-weight: 500;
-      color: var(--text-muted);
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid var(--border);
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .tools-table td {
-      padding: 0.75rem 1rem;
-      border-bottom: 1px solid var(--border);
-      vertical-align: top;
-    }
-
-    .tools-table td:first-child {
-      font-family: var(--mono);
+    .terminal-body {
+      padding: 1rem 1.25rem;
+      font-family: var(--font-mono);
       font-size: 0.8125rem;
-      color: var(--accent);
-      white-space: nowrap;
+      line-height: 1.8;
     }
 
-    .tools-table td:last-child { color: var(--text-secondary); }
+    .t-green { color: var(--accent-green); }
+    .t-blue { color: var(--accent-blue); }
+    .t-dim { color: var(--text-dim); }
+    .t-orange { color: var(--accent-orange); }
+    .t-purple { color: var(--accent-purple); }
 
-    .tools-table tr:last-child td { border-bottom: none; }
-
-    /* --- Comparison --- */
-    .comparison {
-      overflow-x: auto;
-    }
+    /* --- Comparison table --- */
+    .comparison { overflow-x: auto; }
 
     .comparison table {
       width: 100%;
       border-collapse: collapse;
       font-size: 0.8125rem;
-      min-width: 700px;
+      min-width: 650px;
     }
 
-    .comparison th, .comparison td {
-      padding: 0.625rem 0.75rem;
+    .comparison th {
+      font-family: var(--font-pixel);
+      font-size: 0.4375rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--accent-yellow);
+      padding: 0.75rem;
       text-align: left;
       border-bottom: 1px solid var(--border);
     }
 
-    .comparison th {
-      font-weight: 500;
-      color: var(--text-muted);
-      font-size: 0.6875rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
+    .comparison td {
+      padding: 0.625rem 0.75rem;
+      border-bottom: 1px solid var(--border);
     }
 
-    .comparison td:first-child { font-weight: 600; }
+    .comparison td:first-child { font-weight: 600; color: var(--text); }
+    .yes { color: var(--accent-green); }
+    .no { color: var(--text-dim); }
 
-    .check { color: var(--accent); }
-    .cross { color: var(--text-muted); }
-
-    /* --- CTA banner --- */
-    .cta-section {
+    /* --- CTA --- */
+    .cta {
       text-align: center;
-      padding: 6rem 2rem;
+      padding: 5rem 2rem;
       border-top: 1px solid var(--border);
+      position: relative;
+      z-index: 1;
     }
 
-    .cta-section h2 { margin-bottom: 1rem; }
-    .cta-section p { color: var(--text-secondary); margin: 0 auto 2rem; }
+    .cta h2 {
+      font-family: var(--font-pixel);
+      font-size: 0.875rem;
+      color: var(--accent-green);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 20px rgba(0,210,106,0.3);
+    }
+
+    .cta p { color: var(--text-dim); margin-bottom: 1.5rem; }
 
     /* --- Footer --- */
     footer {
-      max-width: var(--max-w);
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 2rem;
+      padding: 1.5rem 2rem;
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      border-top: 1px solid var(--border);
-      font-size: 0.8125rem;
-      color: var(--text-muted);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      position: relative;
+      z-index: 1;
     }
 
-    footer a { color: var(--text-secondary); text-decoration: none; }
-    footer a:hover { color: var(--accent); }
+    footer a { color: var(--text-dim); text-decoration: none; }
+    footer a:hover { color: var(--accent-green); }
 
-    @media (max-width: 640px) { footer { flex-direction: column; gap: 1rem; } }
-
-    /* --- Staggered reveal (Section 4 of taste-skill) --- */
-    .reveal {
+    /* --- Animations --- */
+    .fade-up {
       opacity: 0;
-      transform: translateY(16px);
-      animation: revealUp 0.6s ease forwards;
+      transform: translateY(20px);
+      animation: fadeUp 0.5s ease forwards;
     }
 
-    @keyframes revealUp {
-      to { opacity: 1; transform: translateY(0); }
+    @keyframes fadeUp { to { opacity: 1; transform: none; } }
+    .d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.2s; }
+    .d3 { animation-delay: 0.3s; } .d4 { animation-delay: 0.4s; }
+    .d5 { animation-delay: 0.5s; } .d6 { animation-delay: 0.6s; }
+
+    /* --- XP bar --- */
+    .xp-bar {
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+      margin-top: 0.5rem;
     }
 
-    .reveal-1 { animation-delay: 0.1s; }
-    .reveal-2 { animation-delay: 0.2s; }
-    .reveal-3 { animation-delay: 0.3s; }
-    .reveal-4 { animation-delay: 0.4s; }
-    .reveal-5 { animation-delay: 0.5s; }
-    .reveal-6 { animation-delay: 0.6s; }
+    .xp-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 1s ease;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Hero: split layout -->
+  <!-- Hero -->
   <div class="hero">
     <div class="hero-left">
-      <img src="logo.png" alt="wellinformed" width="140" style="border-radius:50%;border:2px solid var(--border);margin-bottom:1.5rem" class="reveal" />
-      <h1 class="reveal reveal-1">
-        Your agent has tools.<br/>
-        It doesn't have a <span>library</span>.
-      </h1>
-      <p class="reveal reveal-2">
-        wellinformed is an MCP skill that gives AI coding agents persistent research memory.
-        ArXiv papers, HN discussions, RSS feeds, your own codebase &mdash; indexed, embedded, and
-        queryable mid-conversation. Claude Code, Codex, OpenClaw.
+      <h1 class="fade-up">Your agent has<br/>tools. It doesn't<br/>have a library.</h1>
+      <p class="fade-up d1">
+        An MCP skill that gives AI coding agents persistent research memory.
+        ArXiv, HN, RSS, your own codebase &mdash; indexed, embedded, and queryable mid-conversation.
       </p>
-      <div style="display:flex;gap:12px;align-items:center;margin-bottom:1.5rem" class="reveal reveal-3">
+      <div class="social-badges fade-up d2">
         <a href="https://github.com/SaharBarak/wellinformed/stargazers"><img src="https://img.shields.io/github/stars/SaharBarak/wellinformed?style=social" alt="Stars" /></a>
         <a href="https://github.com/SaharBarak/wellinformed/network/members"><img src="https://img.shields.io/github/forks/SaharBarak/wellinformed?style=social" alt="Forks" /></a>
         <a href="https://github.com/SaharBarak/wellinformed/watchers"><img src="https://img.shields.io/github/watchers/SaharBarak/wellinformed?style=social" alt="Watchers" /></a>
       </div>
-      <div class="hero-cta reveal reveal-4">
-        <a href="https://github.com/SaharBarak/wellinformed" class="btn btn-primary">View on GitHub</a>
-        <a href="https://github.com/SaharBarak/wellinformed#install" class="btn btn-secondary">Install</a>
+      <div class="hero-btns fade-up d3">
+        <a href="https://github.com/SaharBarak/wellinformed" class="btn btn-green">View on GitHub</a>
+        <a href="https://github.com/SaharBarak/wellinformed#install" class="btn btn-outline">Install</a>
       </div>
     </div>
-
-    <div class="terminal reveal reveal-4">
-      <div class="terminal-bar">
-        <div class="terminal-dot"></div>
-        <div class="terminal-dot"></div>
-        <div class="terminal-dot"></div>
-      </div>
-      <div class="terminal-body">
-        <div><span class="prompt">$</span> <span class="cmd">wellinformed ask "vector search dedup"</span></div>
-        <br/>
-        <div class="output"># wellinformed results</div>
-        <br/>
-        <div class="output">## <span class="highlight">sqlite-vec</span> (npm dep)</div>
-        <div class="output">distance: 0.908 | source: npm://sqlite-vec</div>
-        <br/>
-        <div class="output">## <span class="highlight">vector-index.ts</span> (your code)</div>
-        <div class="output">distance: 1.021 | source: file://src/infrastructure/vector-index.ts</div>
-        <br/>
-        <div class="output">## <span class="highlight">Syntaqlite Playground</span> (Simon Willison)</div>
-        <div class="output">distance: 1.023 | source: simonwillison.net</div>
-        <br/>
-        <div class="output" style="color: var(--text-muted); font-style: italic;">
-          &uarr; your code + external blog post, same query
+    <div class="hero-right fade-up d2">
+      <div class="welly-sprite" style="margin:0 auto"></div>
+      <div class="stat-bar">
+        <h3>Agent Stats</h3>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <div class="stat-value c-green">154</div>
+            <div class="stat-label">Nodes</div>
+            <div class="xp-bar"><div class="xp-fill" style="width:72%;background:var(--accent-green)"></div></div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value c-blue">11</div>
+            <div class="stat-label">MCP Tools</div>
+            <div class="xp-bar"><div class="xp-fill" style="width:100%;background:var(--accent-blue)"></div></div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-value c-orange">8</div>
+            <div class="stat-label">Adapters</div>
+            <div class="xp-bar"><div class="xp-fill" style="width:88%;background:var(--accent-orange)"></div></div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Features: border-based grid, no cards -->
+  <!-- Quest Log (Features) -->
   <section>
-    <h2 class="reveal">What it does</h2>
-    <p class="reveal">Not another bookmarking tool. A live knowledge graph your agent queries autonomously.</p>
-    <div class="features">
-      <div class="feature reveal reveal-1">
-        <div class="tag">MCP Native</div>
-        <h3>11 tools your agent calls</h3>
-        <p>search, ask, get_node, get_neighbors, find_tunnels, trigger_room, graph_stats, and more. Claude uses them without you copy-pasting anything.</p>
+    <div class="section-title fade-up">Quest Log</div>
+    <h2 class="fade-up">What your agent unlocks</h2>
+    <p class="fade-up">Each capability is a tool the agent calls autonomously. Not commands for you.</p>
+    <div class="quests">
+      <div class="quest fade-up d1">
+        <div class="quest-tag c-green">MCP Native</div>
+        <h3>11 tools for your agent</h3>
+        <p>search, ask, get_node, find_tunnels, trigger_room. Claude calls them mid-conversation without copy-paste.</p>
       </div>
-      <div class="feature reveal reveal-2">
-        <div class="tag">Self-Indexing</div>
+      <div class="quest fade-up d2">
+        <div class="quest-tag c-blue">Self-Indexing</div>
         <h3>Knows your codebase</h3>
-        <p>Indexes .ts files, package.json deps, git submodules, commit history. Your agent searches your code and your research in one graph.</p>
+        <p>TypeScript files, package.json deps, git history, submodules. Your agent searches your code and research in one graph.</p>
       </div>
-      <div class="feature reveal reveal-3">
-        <div class="tag">Active Fetching</div>
+      <div class="quest fade-up d3">
+        <div class="quest-tag c-orange">Active Fetching</div>
         <h3>8 source adapters</h3>
-        <p>ArXiv API, Hacker News (Algolia), RSS/Atom feeds, any URL via Readability. Plus 4 project-indexing adapters. Background daemon keeps it fresh.</p>
+        <p>ArXiv API, Hacker News, RSS/Atom, any URL via Readability. Plus codebase, deps, submodules, git log.</p>
       </div>
-      <div class="feature reveal reveal-4">
-        <div class="tag">Rooms</div>
-        <h3>Partitioned by domain</h3>
-        <p>homelab, fundraise, ml-papers. Each room has its own sources and search scope. Tunnels surface when two rooms connect semantically.</p>
+      <div class="quest fade-up d4">
+        <div class="quest-tag c-purple">Rooms</div>
+        <h3>Partitioned domains</h3>
+        <p>homelab, fundraise, ml-papers. Each room has its own scope. Tunnels surface cross-domain connections.</p>
       </div>
-      <div class="feature reveal reveal-5">
-        <div class="tag">Local</div>
+      <div class="quest fade-up d5">
+        <div class="quest-tag c-pink">Local</div>
         <h3>No cloud, no API keys</h3>
-        <p>all-MiniLM-L6-v2 ONNX embeddings, sqlite-vec for search, NetworkX JSON for the graph. Everything under ~/.wellinformed/. Sub-100ms latency.</p>
+        <p>ONNX embeddings, sqlite-vec search, NetworkX graph. Everything under ~/.wellinformed/. Sub-100ms latency.</p>
       </div>
-      <div class="feature reveal reveal-6">
-        <div class="tag">Architecture</div>
-        <h3>Functional DDD</h3>
-        <p>neverthrow Result monads, pure domain layer, ports + adapters infra, no classes. Every lib verified via ossinsight before selection.</p>
+      <div class="quest fade-up d6">
+        <div class="quest-tag c-yellow">Daemon</div>
+        <h3>Auto-updating</h3>
+        <p>Background daemon triggers on a schedule. Discovery suggests new sources from your keywords. Reports generated daily.</p>
       </div>
     </div>
   </section>
 
-  <!-- MCP tools table -->
+  <!-- Terminal demo -->
   <section>
-    <h2>MCP tools</h2>
-    <p>These are capabilities your agent gains. Not commands for you &mdash; tools the agent calls autonomously when it needs context.</p>
-    <table class="tools-table">
-      <thead>
-        <tr>
-          <th>Tool</th>
-          <th>When the agent calls it</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>search</td><td>"What do I know about embeddings?" &mdash; room-scoped semantic k-NN</td></tr>
-        <tr><td>ask</td><td>"Give me context for this question" &mdash; search + assembled context block</td></tr>
-        <tr><td>get_node</td><td>"Show me everything about this source" &mdash; full node attributes</td></tr>
-        <tr><td>get_neighbors</td><td>"What connects to this?" &mdash; graph traversal from a node</td></tr>
-        <tr><td>find_tunnels</td><td>"Any cross-domain connections?" &mdash; semantic similarity across rooms</td></tr>
-        <tr><td>trigger_room</td><td>"Refresh the research" &mdash; fetch + embed + index</td></tr>
-        <tr><td>graph_stats</td><td>"How big is the graph?" &mdash; node/edge/vector counts</td></tr>
-        <tr><td>room_create</td><td>"Start tracking a new area" &mdash; create a room</td></tr>
-        <tr><td>room_list</td><td>"What rooms exist?" &mdash; registry with metadata</td></tr>
-        <tr><td>sources_list</td><td>"What feeds am I pulling from?" &mdash; configured descriptors</td></tr>
-      </tbody>
-    </table>
+    <div class="section-title">Live Demo</div>
+    <h2>What the agent sees</h2>
+    <p>A search for "sqlite vector" returns your code AND an external blog post about the same topic.</p>
+    <div class="terminal" style="max-width:700px">
+      <div class="terminal-bar">
+        <div class="terminal-dot td-red"></div>
+        <div class="terminal-dot td-yellow"></div>
+        <div class="terminal-dot td-green"></div>
+      </div>
+      <div class="terminal-body">
+        <div><span class="t-green">$</span> wellinformed ask <span class="t-blue">"vector search sqlite"</span></div>
+        <br/>
+        <div class="t-dim"># wellinformed results</div>
+        <br/>
+        <div class="t-dim">## <span class="t-green">sqlite-vec</span> <span class="t-purple">(npm dep)</span></div>
+        <div class="t-dim">distance: <span class="t-orange">0.908</span> | source: npm://sqlite-vec</div>
+        <br/>
+        <div class="t-dim">## <span class="t-green">vector-index.ts</span> <span class="t-purple">(your code)</span></div>
+        <div class="t-dim">distance: <span class="t-orange">1.021</span> | source: file://src/infrastructure/vector-index.ts</div>
+        <br/>
+        <div class="t-dim">## <span class="t-green">Syntaqlite Playground</span> <span class="t-purple">(Simon Willison)</span></div>
+        <div class="t-dim">distance: <span class="t-orange">1.023</span> | source: simonwillison.net</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Platforms -->
+  <section>
+    <div class="section-title">Compatibility</div>
+    <h2>Works with your agent</h2>
+    <p></p>
+    <div class="quests" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr))">
+      <div class="quest">
+        <div class="quest-tag c-green">Auto-Discover</div>
+        <h3>Claude Code</h3>
+        <p>Detected via .claude-plugin/plugin.json. Zero config.</p>
+      </div>
+      <div class="quest">
+        <div class="quest-tag c-blue">MCP Server</div>
+        <h3>Codex</h3>
+        <p>Register as MCP tool provider via wellinformed mcp start.</p>
+      </div>
+      <div class="quest">
+        <div class="quest-tag c-purple">MCP Bridge</div>
+        <h3>OpenClaw</h3>
+        <p>Via pluginToolsMcpBridge or direct MCP registration.</p>
+      </div>
+      <div class="quest">
+        <div class="quest-tag c-orange">stdio</div>
+        <h3>Any MCP Host</h3>
+        <p>Standard JSON-RPC over stdio. Universal compatibility.</p>
+      </div>
+    </div>
   </section>
 
   <!-- Comparison -->
   <section>
-    <h2>vs other agent memory</h2>
-    <p>wellinformed is not key-value storage. It is a knowledge graph with active research fetching.</p>
+    <div class="section-title">vs Other Memory</div>
+    <h2>Not key-value storage</h2>
+    <p>A knowledge graph with active source fetching and codebase awareness.</p>
     <div class="comparison">
       <table>
         <thead>
@@ -445,69 +560,31 @@
             <th>wellinformed</th>
             <th>claude-mem</th>
             <th>memsearch</th>
-            <th>mcp-memory-service</th>
+            <th>mcp-memory</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>Structure</td>
-            <td>Graph + vectors</td>
-            <td>Key-value</td>
-            <td>Markdown</td>
-            <td>Generic graph</td>
-          </tr>
-          <tr>
-            <td>Active fetching</td>
-            <td class="check">ArXiv, HN, RSS, URLs</td>
-            <td class="cross">No</td>
-            <td class="cross">No</td>
-            <td class="cross">No</td>
-          </tr>
-          <tr>
-            <td>Codebase indexing</td>
-            <td class="check">Files, deps, git</td>
-            <td class="cross">No</td>
-            <td class="cross">No</td>
-            <td class="cross">No</td>
-          </tr>
-          <tr>
-            <td>Room scoping</td>
-            <td class="check">Partitions + tunnels</td>
-            <td class="cross">No</td>
-            <td class="cross">No</td>
-            <td class="cross">No</td>
-          </tr>
-          <tr>
-            <td>Local embeddings</td>
-            <td class="check">ONNX, no API</td>
-            <td class="cross">N/A</td>
-            <td class="cross">N/A</td>
-            <td>Optional</td>
-          </tr>
-          <tr>
-            <td>Multi-platform</td>
-            <td class="check">Claude, Codex, OpenClaw</td>
-            <td>Claude only</td>
-            <td>Claude only</td>
-            <td class="check">Any MCP</td>
-          </tr>
+          <tr><td>Structure</td><td class="yes">Graph + vectors</td><td>Key-value</td><td>Markdown</td><td>Generic</td></tr>
+          <tr><td>Active fetching</td><td class="yes">ArXiv, HN, RSS</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+          <tr><td>Codebase indexing</td><td class="yes">Files, deps, git</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+          <tr><td>Room scoping</td><td class="yes">Partitions + tunnels</td><td class="no">No</td><td class="no">No</td><td class="no">No</td></tr>
+          <tr><td>Local embeddings</td><td class="yes">ONNX, no API</td><td class="no">N/A</td><td class="no">N/A</td><td>Optional</td></tr>
+          <tr><td>Multi-platform</td><td class="yes">Claude, Codex, OpenClaw</td><td>Claude</td><td>Claude</td><td class="yes">Any MCP</td></tr>
         </tbody>
       </table>
     </div>
   </section>
 
   <!-- CTA -->
-  <div class="cta-section">
-    <h2>Make your agent smarter</h2>
-    <p>Install wellinformed, seed a room, and your agent gains persistent research memory. Three commands.</p>
-    <a href="https://github.com/SaharBarak/wellinformed#install" class="btn btn-primary">Get started</a>
+  <div class="cta">
+    <h2>Level up your agent</h2>
+    <p>Three commands. Persistent research memory. Your agent stops guessing.</p>
+    <a href="https://github.com/SaharBarak/wellinformed#install" class="btn btn-green">Get started</a>
   </div>
 
   <footer>
     <span>MIT &copy; 2026 SaharBarak</span>
-    <div>
-      <a href="https://github.com/SaharBarak/wellinformed">GitHub</a>
-    </div>
+    <a href="https://github.com/SaharBarak/wellinformed">GitHub</a>
   </footer>
 
 </body>
