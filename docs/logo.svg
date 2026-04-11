@@ -1,37 +1,31 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 220" fill="none">
-  <!-- Background -->
-  <rect width="800" height="220" rx="16" fill="#0f0f1a"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" fill="none">
+  <!-- Neutral dark base — Zinc-950 -->
+  <rect width="800" height="200" rx="0" fill="#09090b"/>
 
-  <!-- Icon: knowledge graph - rounded square with connected nodes -->
-  <g transform="translate(40, 30)">
-    <!-- Rounded container -->
-    <rect x="0" y="0" width="160" height="160" rx="32" fill="#1a1a2e" stroke="#2a2a4e" stroke-width="2"/>
+  <!-- Graph icon: minimal, single accent (Emerald-500), 4 nodes + 3 edges -->
+  <g transform="translate(48, 32)">
+    <!-- Edges — thin, emerald at low opacity -->
+    <line x1="32" y1="68" x2="88" y2="40" stroke="#10b981" stroke-width="1.5" opacity="0.4"/>
+    <line x1="32" y1="68" x2="72" y2="108" stroke="#10b981" stroke-width="1.5" opacity="0.4"/>
+    <line x1="88" y1="40" x2="72" y2="108" stroke="#10b981" stroke-width="1.5" opacity="0.4"/>
+    <!-- Tunnel edge — dashed, subtler -->
+    <line x1="72" y1="108" x2="120" y2="96" stroke="#10b981" stroke-width="1" opacity="0.25" stroke-dasharray="4,3"/>
 
-    <!-- Edges (connections) -->
-    <line x1="50" y1="55" x2="110" y2="45" stroke="#4E79A7" stroke-width="3" opacity="0.7"/>
-    <line x1="50" y1="55" x2="80" y2="110" stroke="#4E79A7" stroke-width="3" opacity="0.7"/>
-    <line x1="110" y1="45" x2="120" y2="105" stroke="#4E79A7" stroke-width="3" opacity="0.7"/>
-    <line x1="80" y1="110" x2="120" y2="105" stroke="#4E79A7" stroke-width="3" opacity="0.7"/>
-    <line x1="80" y1="110" x2="50" y2="135" stroke="#76B7B2" stroke-width="2.5" opacity="0.5" stroke-dasharray="5,4"/>
-    <line x1="120" y1="105" x2="140" y2="135" stroke="#76B7B2" stroke-width="2.5" opacity="0.5" stroke-dasharray="5,4"/>
-
-    <!-- Nodes -->
-    <circle cx="50" cy="55" r="12" fill="#4E79A7"/>
-    <circle cx="110" cy="45" r="10" fill="#4E79A7"/>
-    <circle cx="80" cy="110" r="14" fill="#59A14F"/>
-    <circle cx="120" cy="105" r="9" fill="#59A14F"/>
-
-    <!-- Tunnel nodes (cross-room, different color) -->
-    <circle cx="50" cy="135" r="8" fill="#F28E2B" opacity="0.8"/>
-    <circle cx="140" cy="135" r="8" fill="#F28E2B" opacity="0.8"/>
-
-    <!-- Pulse rings on the god node -->
-    <circle cx="80" cy="110" r="20" fill="none" stroke="#59A14F" stroke-width="1.5" opacity="0.3"/>
-    <circle cx="80" cy="110" r="26" fill="none" stroke="#59A14F" stroke-width="1" opacity="0.15"/>
+    <!-- Nodes — solid emerald, varying size = importance -->
+    <circle cx="32" cy="68" r="8" fill="#10b981"/>
+    <circle cx="88" cy="40" r="6" fill="#10b981"/>
+    <circle cx="72" cy="108" r="10" fill="#10b981"/>
+    <!-- Tunnel node — outline only -->
+    <circle cx="120" cy="96" r="5" fill="none" stroke="#10b981" stroke-width="1.5" opacity="0.5"/>
   </g>
 
-  <!-- Text: wellinformed -->
-  <text x="230" y="135" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="72" font-weight="800" fill="#e0e0e0" letter-spacing="-2">
+  <!-- Typography: tracking-tight, clean sans -->
+  <text x="200" y="120" font-family="'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#fafafa" letter-spacing="-3">
     wellinformed
+  </text>
+
+  <!-- Subtle tagline -->
+  <text x="202" y="152" font-family="'Inter', -apple-system, sans-serif" font-size="14" font-weight="400" fill="#71717a" letter-spacing="0.5">
+    persistent research memory for AI agents
   </text>
 </svg>
