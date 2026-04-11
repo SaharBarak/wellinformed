@@ -2,10 +2,10 @@
 
 ## Current Position
 
-Phase: Not started (defining requirements)
-Plan: —
-Status: Defining requirements
-Last activity: 2026-04-12 — Milestone v1.0 started
+Phase: 7 (Telegram Bridge)
+Plan: Not yet planned
+Status: Roadmap created, ready to plan Phase 7
+Last activity: 2026-04-12 — Roadmap created (4 phases, 29 requirements)
 
 ## Project Reference
 
