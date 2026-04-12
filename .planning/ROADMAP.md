@@ -44,19 +44,19 @@ Plans:
 3. Concurrent node additions from both peers converge correctly
 4. Offline peer reconnects and catches up without full resync
 
-## Phase 17: Federated Search + Discovery
+## Phase 17: Federated Search + Discovery ✓ COMPLETE 2026-04-12
 
 **Goal:** Search across the P2P network. Tunnel detection across peers. Auto-discover peers on local network + DHT.
 
-**Requirements:** FED-01..05, DISC-01..04 (DISC-04 coordination server explicitly deferred to Phase 18+)
+**Requirements:** FED-01..05, DISC-01..04 (DISC-04 coordination server explicitly deferred to Phase 18+; live-network UAT deferred to Phase 18)
 
-**Plans:** 4 plans
+**Plans:** 4/4 complete
 
 Plans:
-- [ ] 17-01-PLAN.md — Foundation: install @libp2p/mdns + kad-dht + bootstrap (exact pins), add SearchError 5-variant union to AppError/formatError, PeerRecord.discovery_method optional, PeerConfig.mdns/dht/search_rate_limit (Wave 1)
-- [ ] 17-02-PLAN.md — Protocol + discovery infra: peer-transport.ts mDNS/DHT/identify wiring with peer:discovery→dial+persist, /wellinformed/search/1.0.0 handler, token bucket rate limiter, runFederatedSearch orchestrator with parallel fan-out + 2s timeout + findTunnels pass (Wave 2)
-- [ ] 17-03-PLAN.md — Surface: `ask --peers` flag + askFederated helper, peer list discovery_method column, MCP 14th tool `federated_search` with privacy disclosure, daemon bootstrap registers search protocol alongside share protocol (Wave 3)
-- [ ] 17-04-PLAN.md — TDD test suite: 3 files (federated-search + mcp-tool + discovery) covering FED-01..05 + DISC-01..04 + all 7 pitfalls from research (mDNS auto-dial, Docker/WSL mDNS, Float32 precision, DHT+identify, SearchError exhaustive, PeerRecord migration, rate limiter leak) (Wave 4)
+- [x] 17-01-PLAN.md — Foundation: 3 libp2p deps, SearchError 5-variant, PeerRecord.discovery_method, PeerConfig extensions — DONE 2026-04-12
+- [x] 17-02-PLAN.md — Protocol + discovery infra: mDNS/DHT/peer:discovery, /wellinformed/search/1.0.0, token bucket, runFederatedSearch — DONE 2026-04-12
+- [x] 17-03-PLAN.md — Surface: ask --peers, peer list column, 14th MCP tool federated_search, daemon search protocol — DONE 2026-04-12
+- [x] 17-04-PLAN.md — TDD suite: 36 tests covering FED-01..05 + DISC-01..04 + 7 pitfalls (163/163 full suite pass) — DONE 2026-04-12
 
 **Success criteria:**
 1. `ask "query" --peers` returns results from connected peers' shared rooms
