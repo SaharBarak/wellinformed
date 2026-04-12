@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-04-12T08:26:05.459Z"
+last_updated: "2026-04-12T10:25:57.146Z"
 progress:
   total_phases: 4
   completed_phases: 0
@@ -16,7 +16,13 @@ progress:
 ## Current Position
 
 Phase: 16 (Room Sharing via Y.js CRDT) — EXECUTING
-Plan: 1 of ?
+Plan: 2 of 4
+
+### Plan 16-01 Complete (2026-04-12T10:24:51Z)
+
+- Commits: 92e9aa6, a47648e, 8054e55, 730a081
+- Files: package.json (yjs@13.6.30 + y-protocols@1.0.7), src/domain/errors.ts (ShareError 7 variants), src/infrastructure/share-store.ts (new), src/infrastructure/ydoc-store.ts (new)
+- Summary: .planning/phases/phase-16/16-01-SUMMARY.md
 
 ### Plan 15-01 Complete (2026-04-12T07:58:38Z)
 
@@ -68,7 +74,7 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 
 - PeerStoreReadError + PeerStoreWriteError kept separate from PeerIdentityRead/WriteError (peers.json ≠ peer-identity.json)
 - ShareableNode enforces SEC-03 boundary at the type system level, not runtime filtering
-- AppError union now covers all 5 bounded contexts: GraphError | VectorError | EmbeddingError | PeerError | ScanError
+- AppError union now covers all 6 bounded contexts: GraphError | VectorError | EmbeddingError | PeerError | ScanError | ShareError
 - privateKeyFromRaw (libp2p 3.x) replaces plan's unmarshalEd25519PrivateKey (old API no longer exported)
 - PE.transportError used for hangUpPeer failures (PE.notFound reserved for registry lookup misses only)
 - [Phase 15]: All 37 Phase 15 tests went GREEN on first run — implementations from Plans 01+02 were already correct
@@ -78,3 +84,7 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 - [Plan 15-03]: `share audit` uses fileGraphRepository directly — avoids opening sqlite vector index for read-only audit
 - [Plan 15-03]: formatError accepts GraphError/PeerError/ScanError without casts — all are AppError union members
 - [Plan 15-03]: `share audit --json` emits full ShareableNode records + ScanMatch arrays (not just counts)
+- [Plan 16-01]: yjs@13.6.30 + y-protocols@1.0.7 pinned exact (no ^ or ~); dep budget = 2 new direct deps
+- [Plan 16-01]: V1 encoding enforced in ydoc-store.ts — encodeStateAsUpdate/applyUpdate only; V2 APIs explicitly forbidden
+- [Plan 16-01]: Per-path writeQueues Map serializes concurrent saveYDoc calls; snapshot taken synchronously at call time
+- [Plan 16-01]: loadYDoc never calls doc.getMap — strict init order (new Doc → applyUpdate → return to caller)

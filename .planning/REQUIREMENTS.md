@@ -26,12 +26,12 @@
 
 ### Room Sharing
 
-- [ ] **SHARE-01**: `wellinformed share room <name>` marks a room as public (shared with connected peers)
-- [ ] **SHARE-02**: `wellinformed unshare room <name>` makes a room private again
-- [ ] **SHARE-03**: Shared rooms sync via Y.js CRDT — concurrent edits from multiple peers converge
-- [ ] **SHARE-04**: Only metadata + embeddings replicate (node labels, vectors, edges) — not raw source text
-- [ ] **SHARE-05**: Sync is incremental — only new/changed nodes since last sync
-- [ ] **SHARE-06**: Offline changes queue and sync automatically when peers reconnect
+- [x] **SHARE-01**: `wellinformed share room <name>` marks a room as public (shared with connected peers)
+- [x] **SHARE-02**: `wellinformed unshare room <name>` makes a room private again
+- [x] **SHARE-03**: Shared rooms sync via Y.js CRDT — concurrent edits from multiple peers converge
+- [x] **SHARE-04**: Only metadata + embeddings replicate (node labels, vectors, edges) — not raw source text
+- [x] **SHARE-05**: Sync is incremental — only new/changed nodes since last sync
+- [x] **SHARE-06**: Offline changes queue and sync automatically when peers reconnect
 
 ### Federated Search
 
