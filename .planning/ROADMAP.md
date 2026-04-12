@@ -76,19 +76,19 @@ Plans:
 3. Connection drops are detected and auto-reconnected
 4. 10+ peers connected simultaneously without degradation
 
-## Phase 19: Structured Codebase Indexing
+## Phase 19: Structured Codebase Indexing ✓ COMPLETE 2026-04-12
 
 **Goal:** Parse codebases into a rich, structured code graph (classes, functions, signatures, call graph) stored separately from the research room graph. Codebases are first-class aggregates attachable to rooms via a join table. Powered by tree-sitter with TypeScript + Python grammars.
 
-**Requirements:** CODE-01..08
+**Requirements:** CODE-01..08 (all 8 complete)
 
-**Plans:** 4 plans
+**Plans:** 4/4 complete
 
 Plans:
-- [ ] 19-01-PLAN.md — Foundation: pin tree-sitter@0.25.0 + typescript@0.23.2 + python@0.25.0, CodebaseError (8 variants), src/domain/codebase.ts (types + pure id helpers), src/infrastructure/code-graph.ts (openCodeGraph + schema v1 migration, 4 tables, 11 repo methods)
-- [ ] 19-02-PLAN.md — Parser + indexer: src/infrastructure/tree-sitter-parser.ts (CommonJS interop, per-language Parser cache reuse, KIND_MAP walker, 5-pattern heuristic, PendingCall), src/application/codebase-indexer.ts (two-pass call graph resolution with exact/heuristic/unresolved, content-hash incremental reindex)
-- [ ] 19-03-PLAN.md — CLI + MCP surface: src/cli/commands/codebase.ts (8 subcommands: index/list/show/reindex/attach/detach/search/remove), src/cli/runtime.ts (codeGraph path), src/cli/index.ts (dispatcher case), src/mcp/server.ts (15th tool code_graph_query). Existing sources/codebase.ts + index-project.ts NOT touched.
-- [ ] 19-04-PLAN.md — TDD suite: tests/phase19.codebase-indexing.test.ts (11+ describe groups, 20+ tests covering CODE-01..08 + 6 pitfall regressions + file-untouched guards + pinned-deps + MCP tool count), 5 fixtures under tests/fixtures/phase19/
+- [x] 19-01-PLAN.md — Foundation: tree-sitter@0.21.1 + typescript@0.23.2 + python@0.23.4 (exact pins), CodebaseError (8 variants), src/domain/codebase.ts (163 lines), src/infrastructure/code-graph.ts (429 lines, 11 repo methods) — DONE 2026-04-12
+- [x] 19-02-PLAN.md — Parser + indexer: tree-sitter-parser.ts (384 lines, Map<Lang,Parser> cache, CJS interop), codebase-indexer.ts (350 lines, two-pass exact/heuristic/unresolved resolution, content-hash incremental) — DONE 2026-04-12
+- [x] 19-03-PLAN.md — CLI + MCP: cli/commands/codebase.ts (430 lines, 8 subcommands), runtime.ts (codeGraph path), cli/index.ts (dispatcher), mcp/server.ts (15th tool code_graph_query) — DONE 2026-04-12
+- [x] 19-04-PLAN.md — TDD suite: 5 fixtures + tests/phase19.codebase-indexing.test.ts (757 lines, 14 describe groups, 36 tests, 199/199 full suite pass) — DONE 2026-04-12
 
 **Success criteria:**
 1. `wellinformed codebase index <path>` parses a TypeScript/JavaScript codebase into `~/.wellinformed/code-graph.db` with classes, functions, methods, imports, exports
