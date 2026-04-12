@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-04-12T11:23:08.624Z"
+last_updated: "2026-04-12T12:42:08.652Z"
 progress:
   total_phases: 4
   completed_phases: 0
@@ -107,3 +107,7 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 - [Plan 16-04]: Block-comment stripping applied before doesNotMatch structural assertions — JSDoc mentions of forbidden APIs do not cause false failures
 - [Plan 16-04]: Uint8ArrayList.subarray structural test uses pipeline pattern (frameIter .subarray() + handleInboundFrame param type) — flatten-in-iterator design, not co-located with createDecoder
 - [Plan 16-04]: Phase 16 complete — 127/127 tests pass, all SHARE-01..06 requirements locked by regression tests
+- [Phase phase-17]: @libp2p/identify not installed — not available transitively from libp2p@3.2.0 or new deps, and not required by any Phase 17 code
+- [Phase phase-17]: PEERS_FILE_VERSION stays at 1 — discovery_method is additive-optional; no migration needed
+- [Phase phase-17]: SearchError is 7th bounded context in AppError; formatError has exhaustive switch for all 5 variants; mdns default true (DISC-02), dht.enabled default false (DISC-03), search_rate_limit 10/30 locked
+- [Phase phase-17]: DISC-04 coordination server explicitly deferred — @libp2p/bootstrap installed for DHT seed peer list only
