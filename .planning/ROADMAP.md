@@ -4,19 +4,19 @@
 **Phases:** 15-18 (continues from v1.1 which ended at Phase 14)
 **Requirements:** 30 mapped
 
-## Phase 15: Peer Foundation + Security
+## Phase 15: Peer Foundation + Security ✓ COMPLETE 2026-04-12
 
 **Goal:** Peer identity, manual peer management, and secrets scanning so the security model is built BEFORE any sharing happens.
 
-**Requirements:** PEER-01..05, SEC-01..06
+**Requirements:** PEER-01..05, SEC-01..06 (PEER-04 partial — live status deferred to Phase 18)
 
-**Plans:** 4 plans
+**Plans:** 4/4 complete
 
 Plans:
 - [x] 15-01-PLAN.md — Domain types + security scanner (peer.ts, sharing.ts, errors, config) — DONE 2026-04-12
 - [x] 15-02-PLAN.md — Infrastructure layer (libp2p install, peer-transport.ts, peer-store.ts) — DONE 2026-04-12
 - [x] 15-03-PLAN.md — CLI commands (peer add/remove/list/status, share audit, index.ts wiring) — DONE 2026-04-12
-- [ ] 15-04-PLAN.md — TDD test suite (all 11 requirements covered)
+- [x] 15-04-PLAN.md — TDD test suite (37 tests, 11 requirements, 70/70 full suite pass) — DONE 2026-04-12
 
 **Success criteria:**
 1. First run generates ed25519 keypair at ~/.wellinformed/peer-identity.json
