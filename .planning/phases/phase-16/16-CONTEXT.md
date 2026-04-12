@@ -27,9 +27,9 @@ Mark rooms as public and sync their nodes across connected peers using Y.js CRDT
 - Standard y-protocols **sync step 1 (state vector) + sync step 2 (missing updates)** — no custom diffing, handles offline catchup (SHARE-06) natively via Y.js state vectors
 
 ### Share / Unshare Semantics
-- `share room X` — creates/loads the Y.Doc, runs `auditRoom` security scan, blocks on any flagged node, registers room in `~/.wellinformed/shared-rooms.json`, immediately pushes `SubscribeRequest` to all currently-connected peers
-- `unshare room X` local effect — removes room from registry, closes active Y.Doc streams, **keeps the local .ydoc file** so a future `share room X` resumes from current state
-- `unshare room X` remote effect — peers receive a `ROOM_UNSHARED` signal and stop receiving updates but **keep previously-imported nodes** (imported nodes are knowledge; deleting them would be hostile)
+- `share room X` — creates/loads the Y.Doc, runs `auditRoom` security scan, blocks on any flagged node, registers room in `~/.wellinformed/shared-rooms.json`. The daemon tick (polling interval configurable, default ≤5s) detects the new room on its next run and opens sync streams to all currently-connected peers. No immediate push from the CLI — the CLI does not maintain a live libp2p node (Phase 15 review flagged "one libp2p node per CLI invocation" as an architectural risk; the daemon-owned sync is the resolved design).
+- `unshare room X` local effect — removes room from `shared-rooms.json` registry. The daemon tick detects the room is gone on its next run and closes any active sync streams for that room. **Keeps the local .ydoc file** so a future `share room X` resumes from current state.
+- `unshare room X` remote effect — peers stop receiving updates because the daemon closes the streams. They **keep previously-imported nodes** (imported nodes are knowledge; deleting them would be hostile). No explicit `ROOM_UNSHARED` wire signal — stream close is the signal.
 - New shared-rooms registry at `~/.wellinformed/shared-rooms.json` with `version: 1` field (mirrors peers.json schema pattern)
 
 ### Security Integration & Provenance
@@ -96,3 +96,5 @@ Mark rooms as public and sync their nodes across connected peers using Y.js CRDT
 - Reputation system / trust graph — v3
 
 </deferred>
+</content>
+</invoke>
