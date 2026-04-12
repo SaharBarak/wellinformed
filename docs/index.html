@@ -479,8 +479,8 @@
   <!-- HERO: asymmetric 1.2fr / 0.8fr split -->
   <div class="hero">
     <div class="hero-left">
-      <h1 class="reveal">Stop re-Googling things<br/>you already <span class="highlight">read</span>.</h1>
-      <p class="hero-sub reveal d1">You consumed 50 articles this week. Your coding agent saw none of them. wellinformed fixes that &mdash; it fetches from ArXiv, Hacker News, RSS feeds, blogs, any URL you give it, indexes your codebase, deps, and git history, then gives your agent 12 MCP tools to search it all in under 100ms.</p>
+      <h1 class="reveal">A <span class="highlight">distributed</span> memory<br/>for your coding agents.</h1>
+      <p class="hero-sub reveal d1">You consumed 50 articles this week. Your coding agent saw none of them. wellinformed fetches from ArXiv, HN, RSS, blogs, any URL &mdash; indexes your codebase, deps, git history &mdash; and now shares rooms across peers via Y.js CRDT, searches federated across the P2P network, and parses codebases into a structured code graph. 15 MCP tools, sub-100ms, local-first.</p>
       <div class="badges reveal d2">
         <a href="https://github.com/SaharBarak/wellinformed/stargazers"><img src="https://img.shields.io/github/stars/SaharBarak/wellinformed?style=social" alt="Stars" /></a>
         <a href="https://github.com/SaharBarak/wellinformed/network/members"><img src="https://img.shields.io/github/forks/SaharBarak/wellinformed?style=social" alt="Forks" /></a>
@@ -495,21 +495,21 @@
     <div class="hero-right reveal d2">
       <div class="sprite" style="margin:0 auto"></div>
       <div class="glass hud">
-        <div class="hud-title">Agent stats</div>
+        <div class="hud-title">v2.0 stats</div>
         <div class="hud-grid">
           <div class="hud-stat">
-            <div class="hud-val" style="color:var(--accent)">492</div>
+            <div class="hud-val" style="color:var(--accent)">2.7K</div>
             <div class="hud-label">Nodes</div>
-            <div class="bar"><div class="bar-fill" style="width:72%;background:var(--accent)"></div></div>
+            <div class="bar"><div class="bar-fill" style="width:86%;background:var(--accent)"></div></div>
           </div>
           <div class="hud-stat">
-            <div class="hud-val" style="color:var(--accent-cool)">12</div>
+            <div class="hud-val" style="color:var(--accent-cool)">15</div>
             <div class="hud-label">MCP Tools</div>
             <div class="bar"><div class="bar-fill" style="width:100%;background:var(--accent-cool)"></div></div>
           </div>
           <div class="hud-stat">
-            <div class="hud-val" style="color:var(--accent-warm)">10</div>
-            <div class="hud-label">Adapters</div>
+            <div class="hud-val" style="color:var(--accent-warm)">243</div>
+            <div class="hud-label">Tests</div>
             <div class="bar"><div class="bar-fill" style="width:100%;background:var(--accent-warm)"></div></div>
           </div>
         </div>
@@ -526,43 +526,43 @@
     <div class="zigzag">
       <div class="glass item reveal d1">
         <div class="item-tag" style="color:var(--accent)">MCP Native</div>
-        <h3>11 tools your agent calls</h3>
-        <p>search, ask, get_node, find_tunnels, trigger_room. Claude uses them without copy-paste.</p>
+        <h3>15 tools your agent calls</h3>
+        <p>search, ask, get_node, find_tunnels, federated_search, code_graph_query. Claude uses them without copy-paste.</p>
       </div>
       <div class="glass item reveal d2">
-        <div class="item-tag" style="color:var(--accent-cool)">Self-Indexing</div>
-        <h3>Knows your codebase</h3>
-        <p>TypeScript files, deps, git history, submodules. Searches your code and research in one graph.</p>
+        <div class="item-tag" style="color:var(--accent-cool)">P2P Sharing</div>
+        <h3>Rooms sync across peers (Y.js CRDT)</h3>
+        <p>Mark a room shared, connected peers sync it via a custom libp2p protocol. Metadata-only replication, 14-pattern secrets scanner, symmetric in/out. No raw vectors (inversion-attack safe).</p>
       </div>
       <div class="glass item reveal d3">
-        <div class="item-tag" style="color:var(--accent-warm)">Active Fetching</div>
-        <h3>8 adapters + discovery loop</h3>
-        <p>ArXiv, Hacker News, RSS/Atom feeds, any URL, your codebase, npm deps, git submodules, git history. Discovery loop recursively finds more from indexed content.</p>
+        <div class="item-tag" style="color:var(--accent-warm)">Federated Search</div>
+        <h3>Query across the network</h3>
+        <p>ask --peers embeds locally, fans out to connected peers with 2s timeout, merges by distance with _source_peer annotation. mDNS auto-discovers on LAN. DHT wired for internet-wide.</p>
       </div>
       <div class="glass item reveal d4">
-        <div class="item-tag" style="color:var(--accent-rose)">Rooms</div>
-        <h3>Partitioned domains</h3>
-        <p>homelab, fundraise, ml-papers. Tunnels surface when two rooms connect semantically.</p>
+        <div class="item-tag" style="color:var(--accent-rose)">NAT Traversal</div>
+        <h3>Production P2P networking</h3>
+        <p>libp2p circuit-relay-v2 + dcutr hole punching + UPnP port forwarding. Bandwidth limiter, passive health monitoring, auto-reconnect. 10-peer mesh verified in ~2.5s.</p>
       </div>
       <div class="glass item reveal d5">
-        <div class="item-tag" style="color:var(--accent)">Local-first</div>
-        <h3>No cloud, no API keys</h3>
-        <p>ONNX embeddings, sqlite-vec search, NetworkX graph. Sub-100ms. All under ~/.wellinformed/.</p>
+        <div class="item-tag" style="color:var(--accent)">Structured Code Graph</div>
+        <h3>Parse codebases with tree-sitter</h3>
+        <p>9 node kinds (class, function, method, interface...), 5 edge kinds (contains, imports, calls...), call graph with confidence levels. Separate from research — codebases attach to rooms via M:N join table.</p>
       </div>
       <div class="glass item reveal d6">
-        <div class="item-tag" style="color:var(--accent-cool)">Background</div>
-        <h3>Auto-updating daemon</h3>
-        <p>Triggers on a schedule. Discovers new sources from keywords. Reports generated daily.</p>
+        <div class="item-tag" style="color:var(--accent-cool)">Active Fetching</div>
+        <h3>8 adapters + discovery loop</h3>
+        <p>ArXiv, HN, RSS/Atom, any URL, codebase, npm deps, git submodules, git history. Discovery loop recursively expands from indexed keywords.</p>
       </div>
       <div class="glass item reveal d7">
-        <div class="item-tag" style="color:var(--accent-warm)">Discovery loop</div>
-        <h3>Self-expanding knowledge</h3>
-        <p>Discovers sources, indexes them, extracts new keywords from the content, discovers more. Recurses until convergence.</p>
+        <div class="item-tag" style="color:var(--accent-warm)">Local-first</div>
+        <h3>No cloud, no API keys</h3>
+        <p>ONNX embeddings, sqlite-vec search. ed25519 peer identity. All state under ~/.wellinformed/. Works offline, syncs when peers reconnect.</p>
       </div>
       <div class="glass item reveal d8">
-        <div class="item-tag" style="color:var(--accent-rose)">Publish</div>
-        <h3>Post to X/Twitter</h3>
-        <p>OAuth 2.0 auth, thread posting, launch command. Preview before posting. Built-in marketing pipeline.</p>
+        <div class="item-tag" style="color:var(--accent-rose)">Functional DDD</div>
+        <h3>Built clean</h3>
+        <p>neverthrow Results, no classes in domain/app, error union discipline per bounded context. 243 tests across 5 phases, zero regressions.</p>
       </div>
     </div>
   </section>
@@ -603,8 +603,8 @@
   <!-- MCP TOOLS: 2-col asymmetric list -->
   <section>
     <div class="label reveal" style="color:var(--accent-warm)">MCP protocol</div>
-    <h2 class="reveal d1">12 tools your agent calls without asking</h2>
-    <p class="desc reveal d2">Claude Code finds the plugin manifest on its own. No setup required beyond the install.</p>
+    <h2 class="reveal d1">15 tools your agent calls without asking</h2>
+    <p class="desc reveal d2">Register globally once with <code style="font-family:var(--mono);color:var(--accent)">claude mcp add --scope user wellinformed -- wellinformed mcp</code> and every new project has all 15 tools available immediately. No per-repo setup.</p>
 
     <div class="glass reveal d3" style="overflow:hidden">
       <div class="tools-grid">
@@ -618,7 +618,9 @@
         <div class="tool-row"><span class="tool-name">room_create</span><span class="tool-desc">Create a new room</span></div>
         <div class="tool-row"><span class="tool-name">room_list</span><span class="tool-desc">Registry with metadata</span></div>
         <div class="tool-row"><span class="tool-name">sources_list</span><span class="tool-desc">Configured source descriptors</span></div>
-        <div class="tool-row"><span class="tool-name">discover_loop</span><span class="tool-desc">Recursive source expansion from keywords</span></div>
+        <div class="tool-row"><span class="tool-name">discover_loop</span><span class="tool-desc">Recursive source expansion</span></div>
+        <div class="tool-row"><span class="tool-name">federated_search</span><span class="tool-desc">Query across connected peers</span></div>
+        <div class="tool-row"><span class="tool-name">code_graph_query</span><span class="tool-desc">Structured code graph query</span></div>
       </div>
     </div>
 
@@ -637,7 +639,7 @@
           <div>mem0 LOCOMO: 67.1%</div>
           <div style="color:var(--accent)">wellinformed: 100.0% R@5, 96.8% NDCG@10</div>
         </div>
-        <div style="margin-top:0.75rem;color:var(--text-muted);font-size:0.6875rem">Reproduce: npm test (33 tests, includes ONNX benchmark)</div>
+        <div style="margin-top:0.75rem;color:var(--text-muted);font-size:0.6875rem">Reproduce: npm test (243 tests across 5 v2.0 phases, includes ONNX benchmark + 10-peer libp2p mesh)</div>
       </div>
     </div>
 
@@ -669,9 +671,9 @@
 
   <!-- CTA -->
   <div class="cta">
-    <h2 class="reveal">Your agent forgot what you read last week.</h2>
-    <p class="reveal d1">Three commands, no API keys, runs locally.</p>
-    <a href="https://github.com/SaharBarak/wellinformed#install-in-3-commands" class="btn btn-primary reveal d2">Install in 3 commands</a>
+    <h2 class="reveal">A P2P memory for every agent you build.</h2>
+    <p class="reveal d1">Three commands, no API keys, runs locally. v2.0 ships P2P sharing, federated search, NAT traversal, and a structured code graph.</p>
+    <a href="https://github.com/SaharBarak/wellinformed#install" class="btn btn-primary reveal d2">Install now</a>
   </div>
 
   <footer>
