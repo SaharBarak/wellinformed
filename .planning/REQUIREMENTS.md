@@ -50,10 +50,10 @@
 
 ### Production Networking
 
-- [ ] **NET-01**: js-libp2p transport with multiplexed streams
-- [ ] **NET-02**: Bandwidth management — configurable sync rate, no flooding
-- [ ] **NET-03**: NAT traversal via libp2p relay + hole punching
-- [ ] **NET-04**: Connection health monitoring with auto-reconnect
+- [x] **NET-01**: js-libp2p transport with multiplexed streams
+- [x] **NET-02**: Bandwidth management — configurable sync rate, no flooding
+- [x] **NET-03**: NAT traversal via libp2p relay + hole punching
+- [x] **NET-04**: Connection health monitoring with auto-reconnect
 
 ### Structured Codebase Indexing
 
