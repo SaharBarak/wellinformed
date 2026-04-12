@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-04-12T10:25:57.146Z"
+last_updated: "2026-04-12T10:38:49.427Z"
 progress:
   total_phases: 4
   completed_phases: 0
@@ -88,3 +88,4 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 - [Plan 16-01]: V1 encoding enforced in ydoc-store.ts — encodeStateAsUpdate/applyUpdate only; V2 APIs explicitly forbidden
 - [Plan 16-01]: Per-path writeQueues Map serializes concurrent saveYDoc calls; snapshot taken synchronously at call time
 - [Plan 16-01]: loadYDoc never calls doc.getMap — strict init order (new Doc → applyUpdate → return to caller)
+- [Phase phase-16]: Used it-length-prefixed lp.encode/lp.decode directly on libp2p Stream's AsyncIterable instead of missing it-length-prefixed-stream transitive dep
