@@ -82,6 +82,14 @@ Plans:
 
 **Requirements:** CODE-01..08
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 19-01-PLAN.md — Foundation: pin tree-sitter@0.25.0 + typescript@0.23.2 + python@0.25.0, CodebaseError (8 variants), src/domain/codebase.ts (types + pure id helpers), src/infrastructure/code-graph.ts (openCodeGraph + schema v1 migration, 4 tables, 11 repo methods)
+- [ ] 19-02-PLAN.md — Parser + indexer: src/infrastructure/tree-sitter-parser.ts (CommonJS interop, per-language Parser cache reuse, KIND_MAP walker, 5-pattern heuristic, PendingCall), src/application/codebase-indexer.ts (two-pass call graph resolution with exact/heuristic/unresolved, content-hash incremental reindex)
+- [ ] 19-03-PLAN.md — CLI + MCP surface: src/cli/commands/codebase.ts (8 subcommands: index/list/show/reindex/attach/detach/search/remove), src/cli/runtime.ts (codeGraph path), src/cli/index.ts (dispatcher case), src/mcp/server.ts (15th tool code_graph_query). Existing sources/codebase.ts + index-project.ts NOT touched.
+- [ ] 19-04-PLAN.md — TDD suite: tests/phase19.codebase-indexing.test.ts (11+ describe groups, 20+ tests covering CODE-01..08 + 6 pitfall regressions + file-untouched guards + pinned-deps + MCP tool count), 5 fixtures under tests/fixtures/phase19/
+
 **Success criteria:**
 1. `wellinformed codebase index <path>` parses a TypeScript/JavaScript codebase into `~/.wellinformed/code-graph.db` with classes, functions, methods, imports, exports
 2. `wellinformed codebase attach <codebase-id> --room <room-id>` attaches a codebase to a research room (M:N)
