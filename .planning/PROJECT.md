@@ -74,15 +74,20 @@ Your coding agent answers from your actual research and codebase, not its traini
 | sequenceLazy thunks | Eager ResultAsync map races on shared state | ✓ Good (caught in Phase 2 acceptance test) |
 | PreToolUse hook for graph awareness | Makes Claude use the graph automatically, no explicit ask | ✓ Good |
 
-## Current Milestone: v1.1 Close Competitive Gaps
+## Current Milestone: v2.0 P2P Knowledge Graph
 
-**Goal:** Close the 4 remaining gaps identified in competitive benchmarks against claude-mem, memsearch, mcp-memory-service, and Cognee.
+**Goal:** Transform wellinformed from a single-user tool into a distributed P2P network where nodes share graph fragments, enabling collective intelligence across developers.
 
 **Target features:**
-- Session consolidation (Endless Mode equivalent — compress old sessions, extend effective context)
-- Multimodal ingestion (images via alt-text/EXIF/OCR, audio via transcript extraction)
-- Web dashboard (live graph visualization + search + stats in browser)
-- Real ONNX IR benchmarks (run all-MiniLM-L6-v2 on the labeled corpus, measure true P@K/R@K/MRR)
+- Peer identity + manual peer management (ed25519 keypair, `peer add/remove/list`)
+- Room-level sharing (public/private rooms, Y.js CRDT sync)
+- Federated search (cross-peer semantic search + tunnel detection)
+- Production networking (js-libp2p transport, encryption, mDNS discovery)
+
+**Key libraries (verified via gh API):**
+- Y.js (21.6K stars, pushed Apr 11) — CRDT for room-level state sync
+- js-libp2p (2.5K stars, pushed Apr 11) — P2P networking + transport
+- Hyperswarm (1.3K stars) — DHT-based peer discovery (alternative)
 
 ---
-*Last updated: 2026-04-12 after milestone v1.1 initialization*
+*Last updated: 2026-04-12 after milestone v2.0 initialization*
