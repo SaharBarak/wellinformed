@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-04-12T14:33:12.034Z"
+last_updated: "2026-04-12T14:39:08.746Z"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -142,3 +142,4 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 - [Phase phase-19]: createRequire(import.meta.url) for ESM→CJS tree-sitter interop
 - [Phase phase-19]: Two-pass call graph resolution: PendingCall[] in pass 1, nameToNodes map resolution in pass 2
 - [Phase phase-19]: codebase CLI uses Record key-lookup dispatch (not switch) matching existing peer/share/unshare pattern
+- [Phase phase-19]: tree-sitter version pins corrected to 0.21.1/0.23.2/0.23.4 in test assertions (plan spec was stale 0.25.0)
