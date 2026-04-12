@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-04-12T14:20:53.305Z"
+last_updated: "2026-04-12T14:33:12.034Z"
 progress:
   total_phases: 5
   completed_phases: 0
@@ -141,3 +141,4 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 - [Phase phase-17]: Short-lived libp2p node per ask --peers / federated_search invocation
 - [Phase phase-19]: createRequire(import.meta.url) for ESM→CJS tree-sitter interop
 - [Phase phase-19]: Two-pass call graph resolution: PendingCall[] in pass 1, nameToNodes map resolution in pass 2
+- [Phase phase-19]: codebase CLI uses Record key-lookup dispatch (not switch) matching existing peer/share/unshare pattern

@@ -60,10 +60,10 @@
 - [x] **CODE-01**: `wellinformed codebase index <path>` parses a codebase into `~/.wellinformed/code-graph.db` using tree-sitter (TypeScript + Python grammars at minimum)
 - [x] **CODE-02**: Code graph schema captures: file, module, class, interface, function, method, signature (parameters + return type), imports, exports, call graph edges — stored in a separate SQLite database distinct from the research graph
 - [x] **CODE-03**: Codebase is a first-class DDD aggregate root with its own `CodebaseId`, separate from `RoomId`
-- [ ] **CODE-04**: `wellinformed codebase attach <codebase-id> --room <room-id>` attaches a codebase to a room via the `codebase_rooms` join table (M:N — one codebase can be attached to multiple rooms, one room can reference multiple codebases)
-- [ ] **CODE-05**: `wellinformed codebase list` shows all indexed codebases with their language, node count, and attached rooms
+- [x] **CODE-04**: `wellinformed codebase attach <codebase-id> --room <room-id>` attaches a codebase to a room via the `codebase_rooms` join table (M:N — one codebase can be attached to multiple rooms, one room can reference multiple codebases)
+- [x] **CODE-05**: `wellinformed codebase list` shows all indexed codebases with their language, node count, and attached rooms
 - [x] **CODE-06**: `wellinformed codebase reindex <codebase-id>` incrementally re-indexes changed files (by mtime or git SHA) without re-parsing unchanged files
-- [ ] **CODE-07**: `wellinformed codebase search <query>` returns code nodes matching the query across attached codebases, with line/column locations
+- [x] **CODE-07**: `wellinformed codebase search <query>` returns code nodes matching the query across attached codebases, with line/column locations
 - [x] **CODE-08**: New MCP tool `code_graph_query` lets Claude query the structured code graph mid-conversation, separate from the research graph's `search`/`ask` tools
 
 ## v3 Requirements (deferred)
