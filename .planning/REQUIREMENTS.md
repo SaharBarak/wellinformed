@@ -7,7 +7,7 @@
 
 ### Peer Identity & Management
 
-- [ ] **PEER-01**: Each wellinformed instance has an ed25519 keypair generated on first run, stored at ~/.wellinformed/peer-identity.json
+- [x] **PEER-01**: Each wellinformed instance has an ed25519 keypair generated on first run, stored at ~/.wellinformed/peer-identity.json
 - [ ] **PEER-02**: `wellinformed peer add <multiaddr>` connects to a remote peer via js-libp2p
 - [ ] **PEER-03**: `wellinformed peer remove <id>` disconnects and removes a peer
 - [ ] **PEER-04**: `wellinformed peer list` shows connected peers with status, latency, shared rooms
@@ -19,8 +19,8 @@
 - [ ] **SEC-02**: Flagged nodes are BLOCKED from sharing with a clear warning
 - [ ] **SEC-03**: Shared nodes carry only: id, label, room, embedding vector, source_uri, fetched_at. No raw text, no content_sha256, no file contents
 - [ ] **SEC-04**: `wellinformed share audit --room X` shows exactly what would be shared before enabling
-- [ ] **SEC-05**: All P2P traffic encrypted via libp2p Noise protocol
-- [ ] **SEC-06**: Peer authentication via ed25519 signature verification
+- [x] **SEC-05**: All P2P traffic encrypted via libp2p Noise protocol
+- [x] **SEC-06**: Peer authentication via ed25519 signature verification
 
 ### Room Sharing
 
