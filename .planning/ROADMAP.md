@@ -64,19 +64,19 @@ Plans:
 3. mDNS discovers peers on the same local network automatically
 4. MCP tool `federated_search` works from Claude Code
 
-## Phase 18: Production Networking
+## Phase 18: Production Networking ✓ COMPLETE 2026-04-12
 
 **Goal:** Production-grade P2P networking: multiplexed streams (yamux), NAT traversal (circuit-relay-v2 + dcutr + uPnPNAT), application-layer bandwidth management, and passive connection health monitoring. Last phase of v2.0 — after verify, the milestone ships.
 
-**Requirements:** NET-01..04
+**Requirements:** NET-01..04 (all complete)
 
-**Plans:** 4 plans
+**Plans:** 4/4 complete
 
 Plans:
-- [ ] 18-01-PLAN.md — Foundation: install 3 libp2p deps (exact pins), NetError 6-variant, PeerConfig.relays/upnp/bandwidth + defaults
-- [ ] 18-02-PLAN.md — Infrastructure: bandwidth-limiter.ts (Semaphore + re-exported createRateLimiter), connection-health.ts (HealthTracker), peer-transport wiring (circuitRelayTransport + dcutr + uPnPNAT)
-- [ ] 18-03-PLAN.md — Integration: share-sync bandwidth gate, daemon connection:close listener + relay pre-dial, peer list health column
-- [ ] 18-04-PLAN.md — TDD suite: structural + unit + 10-peer mesh integration (listenPort:0, mdns:false, Promise.allSettled cleanup), all 7 pitfalls locked
+- [x] 18-01-PLAN.md — Foundation: 3 libp2p deps (circuit-relay-v2@4.2.0 + dcutr@3.0.15 + upnp-nat@4.0.15 + identify@4.1.0 transitive), NetError 6-variant, PeerConfig.relays/upnp/bandwidth — DONE 2026-04-12
+- [x] 18-02-PLAN.md — Infrastructure: bandwidth-limiter.ts (Semaphore + re-exported createRateLimiter), connection-health.ts (in-memory HealthTracker), peer-transport wiring (circuitRelayTransport + dcutr + uPnPNAT) — DONE 2026-04-12
+- [x] 18-03-PLAN.md — Integration: share-sync bandwidth gate with BandwidthExceeded error, daemon connection:close listener + conn.limits filter + relay pre-dial, peer list health column — DONE 2026-04-12
+- [x] 18-04-PLAN.md — TDD suite: 685 lines, 44 tests across 3 tiers (structural + unit + 10-peer integration in ~2.5s), all 7 pitfalls regression-locked (243/243 full suite pass) — DONE 2026-04-12
 
 **Success criteria:**
 1. Peers behind NAT connect via libp2p relay + hole punching
