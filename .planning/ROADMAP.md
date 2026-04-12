@@ -10,6 +10,14 @@
 
 **Requirements:** PEER-01..05, SEC-01..06
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 15-01-PLAN.md — Domain types + security scanner (peer.ts, sharing.ts, errors, config)
+- [ ] 15-02-PLAN.md — Infrastructure layer (libp2p install, peer-transport.ts, peer-store.ts)
+- [ ] 15-03-PLAN.md — CLI commands (peer add/remove/list/status, share audit, index.ts wiring)
+- [ ] 15-04-PLAN.md — TDD test suite (all 11 requirements covered)
+
 **Success criteria:**
 1. First run generates ed25519 keypair at ~/.wellinformed/peer-identity.json
 2. `peer add <multiaddr>` establishes a js-libp2p connection
