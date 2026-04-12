@@ -48,7 +48,15 @@ Plans:
 
 **Goal:** Search across the P2P network. Tunnel detection across peers. Auto-discover peers on local network + DHT.
 
-**Requirements:** FED-01..05, DISC-01..04
+**Requirements:** FED-01..05, DISC-01..04 (DISC-04 coordination server explicitly deferred to Phase 18+)
+
+**Plans:** 4 plans
+
+Plans:
+- [ ] 17-01-PLAN.md — Foundation: install @libp2p/mdns + kad-dht + bootstrap (exact pins), add SearchError 5-variant union to AppError/formatError, PeerRecord.discovery_method optional, PeerConfig.mdns/dht/search_rate_limit (Wave 1)
+- [ ] 17-02-PLAN.md — Protocol + discovery infra: peer-transport.ts mDNS/DHT/identify wiring with peer:discovery→dial+persist, /wellinformed/search/1.0.0 handler, token bucket rate limiter, runFederatedSearch orchestrator with parallel fan-out + 2s timeout + findTunnels pass (Wave 2)
+- [ ] 17-03-PLAN.md — Surface: `ask --peers` flag + askFederated helper, peer list discovery_method column, MCP 14th tool `federated_search` with privacy disclosure, daemon bootstrap registers search protocol alongside share protocol (Wave 3)
+- [ ] 17-04-PLAN.md — TDD test suite: 3 files (federated-search + mcp-tool + discovery) covering FED-01..05 + DISC-01..04 + all 7 pitfalls from research (mDNS auto-dial, Docker/WSL mDNS, Float32 precision, DHT+identify, SearchError exhaustive, PeerRecord migration, rate limiter leak) (Wave 4)
 
 **Success criteria:**
 1. `ask "query" --peers` returns results from connected peers' shared rooms
