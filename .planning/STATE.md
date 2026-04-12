@@ -16,7 +16,21 @@ progress:
 ## Current Position
 
 Phase: 17 (Federated Search + Discovery) — EXECUTING
-Plan: 1 of ?
+Plan: 3 of ?
+
+### Plan 17-02 Complete (2026-04-12T12:50:42Z)
+
+- Commits: 2a8f4ba, 83876eb, 29a45a9
+- Files: src/infrastructure/peer-transport.ts (mDNS/DHT/peer:discovery), src/infrastructure/search-sync.ts (new — 508 lines), src/application/federated-search.ts (new — 294 lines)
+- Summary: .planning/phases/phase-17/17-02-SUMMARY.md
+- Delivers DISC-02/03 (mDNS default on, DHT wired off), FED-02/03/04 (protocol handler + fan-out + tunnel pass)
+- 127/127 tests pass, all 7 pitfall patterns grep-verified
+
+### Plan 17-01 Complete (2026-04-12T12:41:00Z)
+
+- Commits: 94db382, 7675409
+- Files: package.json, src/domain/errors.ts, src/infrastructure/peer-store.ts, src/infrastructure/config-loader.ts
+- Summary: .planning/phases/phase-17/17-01-SUMMARY.md
 
 ### Plan 16-04 Complete (2026-04-12T11:30:00Z)
 
@@ -111,3 +125,7 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 - [Phase phase-17]: PEERS_FILE_VERSION stays at 1 — discovery_method is additive-optional; no migration needed
 - [Phase phase-17]: SearchError is 7th bounded context in AppError; formatError has exhaustive switch for all 5 variants; mdns default true (DISC-02), dht.enabled default false (DISC-03), search_rate_limit 10/30 locked
 - [Phase phase-17]: DISC-04 coordination server explicitly deferred — @libp2p/bootstrap installed for DHT seed peer list only
+- [Plan 17-02]: FramedStream copied from share-sync.ts (NOT imported) — search and share stream lifecycles are independent per CONTEXT.md
+- [Plan 17-02]: Fan-out uses Promise.all + Promise.race(2s) per peer — NOT ResultAsync.combine (short-circuits on first error)
+- [Plan 17-02]: DHT runs clientMode:true without @libp2p/identify — package not available transitively; clientMode routing is passive
+- [Plan 17-02]: Peer-only rows skipped in tunnel pass — raw vectors not transmitted on wire (SEC-03 boundary); documented functional subset
