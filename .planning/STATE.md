@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-04-12T14:13:00.000Z"
+last_updated: "2026-04-12T14:20:53.305Z"
 progress:
-  total_phases: 4
+  total_phases: 5
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -139,3 +139,5 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 - [Plan 17-02]: DHT runs clientMode:true without @libp2p/identify — package not available transitively; clientMode routing is passive
 - [Plan 17-02]: Peer-only rows skipped in tunnel pass — raw vectors not transmitted on wire (SEC-03 boundary); documented functional subset
 - [Phase phase-17]: Short-lived libp2p node per ask --peers / federated_search invocation
+- [Phase phase-19]: createRequire(import.meta.url) for ESM→CJS tree-sitter interop
+- [Phase phase-19]: Two-pass call graph resolution: PendingCall[] in pass 1, nameToNodes map resolution in pass 2
