@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-04-13T13:39:25.750Z"
+last_updated: "2026-04-13T13:55:08.383Z"
 progress:
   total_phases: 6
   completed_phases: 0
@@ -174,3 +174,5 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 - [Phase phase-20]: mutateSessionsState called once per tick (not per file) — accumulate updates map, single lock+write cycle for N files
 - [Phase phase20]: rollupSessions exported from CLI module and imported dynamically by MCP tool to avoid circular deps
 - [Phase phase20]: shell hook branches on CLAUDE_HOOK_EVENT — single script, two modes (SessionStart + PreToolUse)
+- [Phase phase-20]: Fixture entry count corrected to 8 (plan said 7) — 4 assistant entries in fixture not 3
+- [Phase phase-20]: Secret fixture uses sk-<pure alnum> not sk-proj- (openai-key regex requires no hyphens after sk-)

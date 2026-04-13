@@ -69,8 +69,8 @@
 ### Session Persistence
 
 - [x] **SESS-01**: New source adapter `src/infrastructure/sources/claude-sessions.ts` walks `~/.claude/projects/<project-hash>/*.jsonl` and ingests every session transcript into a dedicated `sessions` room. Each user message, assistant response, tool call, and hook event becomes a first-class graph node with timestamps, sessionId, parentUuid chain, and git branch.
-- [ ] **SESS-02**: Tool calls (Bash, Edit, Write, Read, Agent, WebFetch, Grep, Glob) are extracted from the JSONL and indexed with full metadata — command, file paths, exit codes, stdout/stderr summaries. File edits track the target file so `ask "when did I last touch X"` works.
-- [ ] **SESS-03**: Incremental ingest — the adapter tracks file mtime + byte offset per JSONL so a 50 MB session doesn't re-parse from byte 0 on every daemon tick. New messages appended since last tick are the only new work.
+- [x] **SESS-02**: Tool calls (Bash, Edit, Write, Read, Agent, WebFetch, Grep, Glob) are extracted from the JSONL and indexed with full metadata — command, file paths, exit codes, stdout/stderr summaries. File edits track the target file so `ask "when did I last touch X"` works.
+- [x] **SESS-03**: Incremental ingest — the adapter tracks file mtime + byte offset per JSONL so a 50 MB session doesn't re-parse from byte 0 on every daemon tick. New messages appended since last tick are the only new work.
 - [x] **SESS-04**: Daemon tick includes a session-sources run (configurable interval, default 5 min) so in-progress sessions are captured in near-realtime without user action.
 - [x] **SESS-05**: New CLI command `wellinformed recent-sessions [--hours N] [--project PATH] [--json]` prints a structured summary of recent sessions: duration, tool-call count, file list, final assistant message, git branch.
 - [x] **SESS-06**: New MCP tool `recent_sessions(hours?, project?, limit?)` — Claude queries previous session state from any new session. Returns the same structured summary as the CLI for machine consumption.
