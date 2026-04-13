@@ -3,9 +3,9 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-04-12T15:54:55.880Z"
+last_updated: "2026-04-13T12:56:44.205Z"
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -152,3 +152,5 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 - [Phase phase-18]: Relay pre-dial best-effort: failures logged but daemon never crashes
 - [Phase phase-18]: bandwidth gate returns errAsync(BandwidthExceeded) — write rejected, not silently accepted
 - [Phase phase-18]: 10-peer integration test completes in ~2.5s with ring+cross-link mesh (listenPort:0, mdns:false, Promise.allSettled)
+- [Phase phase-20]: SessionEntryKind uses session_start_hook (not attachment) to reflect semantic role, not JSONL structural type
+- [Phase phase-20]: shareable defaults to true for legacy v1 SharedRoomRecord on read; sessions room will be created with shareable: false in Plan 03
