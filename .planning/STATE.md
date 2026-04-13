@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-04-13T13:14:38.527Z"
+last_updated: "2026-04-13T13:39:25.750Z"
 progress:
   total_phases: 6
   completed_phases: 0
@@ -172,3 +172,5 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 - [Phase phase-20]: shareable defaults to true for legacy v1 SharedRoomRecord on read; sessions room will be created with shareable: false in Plan 03
 - [Phase phase-20]: scanNode applied to both baseSummary directly and canonical GraphNode fields — double-check ensures user messages with pasted API keys are caught even though canonical scanNode only covers ShareableNode fields
 - [Phase phase-20]: mutateSessionsState called once per tick (not per file) — accumulate updates map, single lock+write cycle for N files
+- [Phase phase20]: rollupSessions exported from CLI module and imported dynamically by MCP tool to avoid circular deps
+- [Phase phase20]: shell hook branches on CLAUDE_HOOK_EVENT — single script, two modes (SessionStart + PreToolUse)
