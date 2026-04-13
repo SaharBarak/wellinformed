@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-04-13T12:56:44.205Z"
+last_updated: "2026-04-13T13:14:38.527Z"
 progress:
   total_phases: 6
   completed_phases: 0
@@ -15,8 +15,24 @@ progress:
 
 ## Current Position
 
-Phase: 18 (Production Networking) — EXECUTING
-Plan: 1 of ?
+Phase: 20 (Session Persistence) — EXECUTING
+Plan: 3 of 4
+
+### Plan 20-02 Complete (2026-04-13T14:00:00Z)
+
+- Commits: f8f937c, 20eb582, e1c88d3
+- Files: src/infrastructure/sessions-state.ts (new — atomic tmp+rename state I/O), src/infrastructure/sources/claude-sessions.ts (new — source adapter), src/domain/sources.ts (claude_sessions added to SourceKind), src/infrastructure/sources/registry.ts (claudeSessionsSource + ClaudeSessionsDeps), src/cli/runtime.ts (claudeSessions deps wired), tests/phase{2,3,4,5,6}.*.test.ts (stub deps added)
+- Summary: .planning/phases/phase-20/20-02-SUMMARY.md
+- Delivers SESS-01, SESS-02, SESS-03
+- 243/243 tests pass, npx tsc --noEmit exits 0, 0 new npm packages
+- Decision: scanNode applied to baseSummary directly AND canonical GraphNode fields — double-check ensures user messages with pasted API keys are caught
+- Decision: mutateSessionsState called once per tick (not per file) — accumulate updates map, single lock+write cycle for N files
+
+### Plan 20-01 Complete (2026-04-13T12:55:42Z)
+
+- Commits: 5e6d77e, dd06820, b797957
+- Files: src/domain/errors.ts (SessionError 5 variants), src/domain/sessions.ts (new), src/infrastructure/config-loader.ts (SessionsConfig), src/infrastructure/share-store.ts (shareable flag), src/cli/commands/share.ts (shareable: true fix)
+- Summary: .planning/phases/phase-20/20-01-SUMMARY.md
 
 ### Plan 19-01 Complete (2026-04-12T14:13:00Z)
 
@@ -154,3 +170,5 @@ See: .planning/PROJECT.md (updated 2026-04-12)
 - [Phase phase-18]: 10-peer integration test completes in ~2.5s with ring+cross-link mesh (listenPort:0, mdns:false, Promise.allSettled)
 - [Phase phase-20]: SessionEntryKind uses session_start_hook (not attachment) to reflect semantic role, not JSONL structural type
 - [Phase phase-20]: shareable defaults to true for legacy v1 SharedRoomRecord on read; sessions room will be created with shareable: false in Plan 03
+- [Phase phase-20]: scanNode applied to both baseSummary directly and canonical GraphNode fields — double-check ensures user messages with pasted API keys are caught even though canonical scanNode only covers ShareableNode fields
+- [Phase phase-20]: mutateSessionsState called once per tick (not per file) — accumulate updates map, single lock+write cycle for N files
