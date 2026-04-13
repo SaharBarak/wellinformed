@@ -110,6 +110,14 @@ Plans:
 
 **Requirements:** SESS-01..08
 
+**Plans:** 4 plans
+
+Plans:
+- [ ] 20-01-PLAN.md — Foundation: SessionError 5-variant + AppError union + exhaustive formatError, src/domain/sessions.ts (pure types + classifyJsonlEntry + hasKeySignal), AppConfig.sessions, SharedRoomRecord.shareable flag + v1→v2 migration
+- [ ] 20-02-PLAN.md — Infrastructure: sessions-state.ts (atomic tmp+rename), src/infrastructure/sources/claude-sessions.ts (walk + partial-line buffered reads + CLAUDE_SESSION_ID + mtime-5s skip + scanNode redaction), SourceKind extension + registry wiring
+- [ ] 20-03-PLAN.md — Integration: session-ingest use case + daemon tick auto-provisioning + enforceRetention, recent-sessions CLI, 16th MCP tool recent_sessions, share CLI hard-refuse (hardcoded + flag), PreToolUse hook SessionStart branch (idempotent), phase17 C2 test bumped 15→16
+- [ ] 20-04-PLAN.md — TDD suite: 13 describe groups + ≥35 tests, covers SESS-01..08 + 7 critical pitfalls, 2 JSONL fixtures, scope-boundary + zero-deps regression locks
+
 **Success criteria:**
 1. `~/.claude/projects/<hash>/*.jsonl` files are indexed automatically (via daemon tick) into a dedicated `sessions` room
 2. `wellinformed recent-sessions` CLI command shows last N sessions with duration, tool-call summary, and assistant-message highlights
@@ -124,9 +132,9 @@ Plans:
 | 16 | Room Sharing (Y.js CRDT) | SHARE-01..06 (6) | 4 |
 | 17 | Federated Search + Discovery | FED-01..05, DISC-01..04 (9) | 4 |
 | 18 | Production Networking | NET-01..04 (4) | 4 |
-| 20 | Session Persistence | SESS-01..08 (8) | 4 |
 | 19 | Structured Codebase Indexing | CODE-01..08 (8) | 4 |
+| 20 | Session Persistence | SESS-01..08 (8) | 4 |
 | **Total** | | **38** | **20** |
 
 ---
-*Roadmap created: 2026-04-12 (Phase 19 added 2026-04-12 after Phase 18 kickoff)*
+*Roadmap created: 2026-04-12 (Phase 19 added 2026-04-12 after Phase 18 kickoff; Phase 20 planned 2026-04-12)*
