@@ -83,6 +83,43 @@ Wave 2 lands **~2 points below the best dense-only encoders** at roughly equival
 
 **Phase 21 result on SciFact: +0.60 NDCG@10 lift from bench-truth fixes alone** (no encoder swap, no new model). BM25 latency dropped from 9 ms → **2 ms p50** (4.5× faster) because the FTS5 sanitizer no longer builds a 300-clause quoted-OR per query. Other 4 datasets are re-running; Phase 22 (encoder swap to bge-base-en-v1.5) is the next gate.
 
+### 2d. Xenova ONNX port quality — measured, confirmed defective
+
+**Hypothesis:** the ~10-13 NDCG@10 gap between our Xenova-based bench and published numbers on bge-base (and the smaller ArguAna gap on nomic) is caused by Xenova's own ONNX conversions, not by our pipeline code. To test: run the exact same BEIR benchmark via a completely independent Rust crate (`wellinformed-rs/`) using `fastembed-rs`, which downloads its own ONNX weights (Qdrant-published) rather than Xenova's.
+
+**Result: confirmed.** Same dataset, same encoder, same RRF-free dense-only cosine retrieval, two independent ONNX ports.
+
+| Metric | **Rust fastembed** bge-base | TS Xenova bge-base | Published BAAI bge-base |
+|--------|----------------------------|--------------------|-------------------------|
+| NDCG@10 | **74.70%** | 63.29% | 74.04 ✓ |
+| MAP@10 | **70.39%** | 58.76% | 69.30 ✓ |
+| R@5 | **81.43%** | 71.08% | — |
+| R@10 | **86.69%** | 75.69% | 87.42 ✓ |
+| MRR | **0.7130** | 0.5992 | — |
+
+**Rust matches the published ceiling within 0.66 NDCG points.** TypeScript-via-Xenova is **−11.41 NDCG points below published**, not because of our code, but because `Xenova/bge-base-en-v1.5` is a different ONNX conversion than the Qdrant-published one fastembed uses. Changing the pooling strategy, disabling int8 quantization, expanding max_length — none of these moved the TS bge-base number. The weights themselves are the problem.
+
+**This finding applies only to bge-base.** The Xenova port of nomic-embed-text-v1.5 matches published within 0.4 NDCG points on SciFact (measured earlier in Phase 22 diagnostics). Every Xenova port needs to be validated against published numbers before being adopted.
+
+**SciFact MiniLM sanity check (Rust vs TS, same Xenova weights):**
+
+| Metric | Rust fastembed MiniLM | TS Xenova MiniLM |
+|--------|----------------------|------------------|
+| NDCG@10 | **65.27%** | 64.82% |
+| MRR | **0.6111** | 0.6039 |
+| Indexing | **19 docs/sec** | 19 docs/sec |
+
+Quality tied within 0.45 NDCG (noise-level), **throughput identical at 19 docs/sec** — confirming that on correctly-ported weights both runtimes produce equivalent results. Rewriting wellinformed in Rust is NOT a performance lever at the inference layer; both runtimes drive the same native ONNX Runtime, and the language overhead is negligible.
+
+**The real Rust win** is elsewhere:
+- **Weight quality selection.** `fastembed` pulls Qdrant-curated ONNX conversions that have been validated. Xenova's library auto-downloads whatever is in the `Xenova/` namespace, which is not quality-gated.
+- **Brute-force cosine via rayon** is ~2× faster than `sqlite-vec` MATCH on tiny corpora, but this difference vanishes at production scale where ANN index structure dominates.
+
+**Action items for v2.1:**
+1. Replace `Xenova/bge-base-en-v1.5` path with either (a) fastembed-style Qdrant weights loaded via `ort` directly, or (b) stick with nomic which is correctly ported, OR (c) add a Rust-side inference subprocess for encoders Xenova doesn't port correctly.
+2. Add a validation test in CI that embeds one known sentence and compares the vector against a frozen reference — catches future Xenova regressions.
+3. Run Rust bench on the remaining 3 datasets (NFCorpus, ArguAna, SciDocs) to see if the nomic-v1.5 port issue is specific to Xenova too.
+
 **Caveat — Wave 2 hybrid is not universally better.** ArguAna is counter-argument retrieval where the "relevant" document for a query is the argument that *refutes* it. BM25 adds lexical similarity, which is **anti-helpful** for counter-argument tasks: the BM25 stage promotes documents that lexically match the query (i.e., make the *same* argument), not those that refute it. Pure nomic dense-only retrieval scores ~50.4% NDCG@10 on ArguAna (per the [nomic tech report Table 4](https://arxiv.org/abs/2402.01613)); our hybrid Wave 2 number is 12+ points below that. This is a measured honest negative — hybrid retrieval is task-dependent, and BEIR includes at least one task type (counter-argument) where it backfires.
 
 **Practical implication for production Wave 2 swap:** if we ship hybrid as the default, we should also expose dense-only as a fallback for counter-argument and stance-detection style tasks. Or pick the hybrid weight per task. Or keep things simple and accept the trade — most user queries are not counter-argument retrieval.
