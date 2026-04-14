@@ -71,6 +71,20 @@ Phase coverage:
 
 Wave 2 lands **~2 points below the best dense-only encoders** at roughly equivalent parameter budget, and **~4.4 points below GPU-required reranker stacks**. For a 137M model with zero new dependencies (sqlite-vec + sqlite-fts5 are already in our stack), this is competitive.
 
+### Wave 2 — multi-dataset BEIR validation
+
+| Dataset | Corpus | Queries | NDCG@10 | R@5 | R@10 | MRR | Notes |
+|---------|--------|---------|---------|-----|------|-----|-------|
+| **SciFact** | 5,183 | 300 | **72.30%** | 79.76% | 84.79% | 0.690 | Hybrid wins big over dense (+2.32 over Wave 1) |
+| **NFCorpus** | 3,633 | 323 | **34.11%** | 12.82% | 15.85% | 0.539 | Wave 1 dense-only number; hybrid not yet re-run |
+| **ArguAna** | 8,674 | 1,406 | **37.36%** | 57.89% | 78.52% | 0.244 | ⚠ Hybrid REGRESSES vs dense-only (~50% per nomic tech report) — see caveat below |
+
+**Caveat — Wave 2 hybrid is not universally better.** ArguAna is counter-argument retrieval where the "relevant" document for a query is the argument that *refutes* it. BM25 adds lexical similarity, which is **anti-helpful** for counter-argument tasks: the BM25 stage promotes documents that lexically match the query (i.e., make the *same* argument), not those that refute it. Pure nomic dense-only retrieval scores ~50.4% NDCG@10 on ArguAna (per the [nomic tech report Table 4](https://arxiv.org/abs/2402.01613)); our hybrid Wave 2 number is 12+ points below that. This is a measured honest negative — hybrid retrieval is task-dependent, and BEIR includes at least one task type (counter-argument) where it backfires.
+
+**Practical implication for production Wave 2 swap:** if we ship hybrid as the default, we should also expose dense-only as a fallback for counter-argument and stance-detection style tasks. Or pick the hybrid weight per task. Or keep things simple and accept the trade — most user queries are not counter-argument retrieval.
+
+**Note on ArguAna BM25 latency (501 ms p50).** ArguAna queries are unusually long (whole arguments, sometimes 200+ tokens). The FTS5 BM25 sanitizer in `bench-beir-sota.mjs` builds an OR-fused phrase query per token, so a 200-token query becomes ~200 OR clauses against the 8,674-passage corpus — slow but correct. SciFact queries average ~10 tokens, hence the SciFact BM25 p50 of 9 ms. Workload-dependent, not a bug.
+
 ### Wave 2 — reproducible numbers
 
 #### BEIR SciFact (5,183 × 300)
