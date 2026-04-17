@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>wellinformed — persistent research memory for AI agents</title>
-  <meta name="description" content="MCP-native skill for Claude Code, Codex, OpenClaw. Knowledge graph + embeddings + active source fetching." />
+  <title>wellinformed — federated knowledge graph for AI agents</title>
+  <meta name="description" content="P2P memory layer for Claude Code, Codex, and any MCP host. Runs on your CPU, federates with peers you trust, 75.22% NDCG@10 on BEIR SciFact. MIT-licensed. No cloud, no subscription, no benchmark theater." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -479,15 +479,15 @@
   <!-- HERO: asymmetric 1.2fr / 0.8fr split -->
   <div class="hero">
     <div class="hero-left">
-      <h1 class="reveal">A <span class="highlight">distributed</span> memory<br/>for your coding agents.</h1>
-      <p class="hero-sub reveal d1">You consumed 50 articles this week. Your coding agent saw none of them. wellinformed fetches from ArXiv, HN, RSS, blogs, any URL &mdash; indexes your codebase, deps, git history &mdash; and now shares rooms across peers via Y.js CRDT, searches federated across the P2P network, and parses codebases into a structured code graph. 15 MCP tools, sub-100ms, local-first.</p>
+      <h1 class="reveal">Your AI agent's memory<br/>shouldn't live in <span class="highlight">someone else's datacenter</span>.</h1>
+      <p class="hero-sub reveal d1">wellinformed is the MCP-native knowledge graph that runs on your CPU, federates with peers you trust, and sends nothing to anyone's cloud. Indexes your research, your codebase, and your peers' shared rooms into one graph. 75.22% NDCG@10 on BEIR SciFact &mdash; a retrieval benchmark you can actually reproduce. MIT-licensed. No subscription, no API key, no benchmark theater.</p>
       <div class="badges reveal d2">
         <a href="https://github.com/SaharBarak/wellinformed/stargazers"><img src="https://img.shields.io/github/stars/SaharBarak/wellinformed?style=social" alt="Stars" /></a>
         <a href="https://github.com/SaharBarak/wellinformed/network/members"><img src="https://img.shields.io/github/forks/SaharBarak/wellinformed?style=social" alt="Forks" /></a>
         <a href="https://github.com/SaharBarak/wellinformed/watchers"><img src="https://img.shields.io/github/watchers/SaharBarak/wellinformed?style=social" alt="Watchers" /></a>
       </div>
       <div class="btn-row reveal d3">
-        <a href="https://github.com/SaharBarak/wellinformed#install-in-3-commands" class="btn btn-primary">Install in 3 commands</a>
+        <a href="https://github.com/SaharBarak/wellinformed#install" class="btn btn-primary">Run your own node</a>
         <a href="https://github.com/SaharBarak/wellinformed" class="btn btn-ghost">See the code</a>
       </div>
     </div>
@@ -495,20 +495,20 @@
     <div class="hero-right reveal d2">
       <div class="sprite" style="margin:0 auto"></div>
       <div class="glass hud">
-        <div class="hud-title">v2.0 stats</div>
+        <div class="hud-title">v2.1 stats</div>
         <div class="hud-grid">
           <div class="hud-stat">
-            <div class="hud-val" style="color:var(--accent)">2.7K</div>
+            <div class="hud-val" style="color:var(--accent)">10K+</div>
             <div class="hud-label">Nodes</div>
-            <div class="bar"><div class="bar-fill" style="width:86%;background:var(--accent)"></div></div>
+            <div class="bar"><div class="bar-fill" style="width:100%;background:var(--accent)"></div></div>
           </div>
           <div class="hud-stat">
-            <div class="hud-val" style="color:var(--accent-cool)">15</div>
+            <div class="hud-val" style="color:var(--accent-cool)">21</div>
             <div class="hud-label">MCP Tools</div>
             <div class="bar"><div class="bar-fill" style="width:100%;background:var(--accent-cool)"></div></div>
           </div>
           <div class="hud-stat">
-            <div class="hud-val" style="color:var(--accent-warm)">243</div>
+            <div class="hud-val" style="color:var(--accent-warm)">396</div>
             <div class="hud-label">Tests</div>
             <div class="bar"><div class="bar-fill" style="width:100%;background:var(--accent-warm)"></div></div>
           </div>
