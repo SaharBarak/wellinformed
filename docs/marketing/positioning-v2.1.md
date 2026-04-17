@@ -148,7 +148,21 @@ finished work. The more developers on the network, the less research
 anyone has to redo — and nobody needs a vendor's permission for the
 compounding to happen.
 
-### 2. Your graph, not theirs.
+### 2. Your identity is a keypair you own, not a row in someone's DB.
+
+Every wellinformed install provisions a W3C `did:key` (Ed25519,
+32-byte pubkey, base58btc-encoded, multicodec-prefixed per the spec)
+during first boot. Your user DID is long-lived and survives device
+changes. Your device key is authorized by that DID via a signed
+authorization chain, and every message you send to peers — memory
+entries, oracle answers, room shares — can be wrapped in a signed
+envelope that any other peer verifies **offline, in under 2 ms, with
+zero DID-resolver calls**. Rotate a compromised device, keep the user
+DID; nobody ever emails support. No central issuer, no directory
+service, no registry — just cryptography you can audit in 641 lines
+of pure domain code.
+
+### 3. Your graph, not theirs.
 
 Every node is embedded locally. Every query hits your SQLite file
 first, connected peers second, the open web last. The network layer
@@ -159,7 +173,7 @@ out, nobody to shut down, nobody to raise prices. Three system rooms
 every other room is negotiable room-by-room via the interactive
 share picker.
 
-### 3. Benchmarks you can reproduce.
+### 4. Benchmarks you can reproduce.
 
 72.30% NDCG@10 on full BEIR SciFact (5,183 docs × 300 queries). 75.22%
 with the optional Rust embedder. These are measured against
@@ -213,18 +227,29 @@ exchange graphs without negotiating.
 
 You don't, and you shouldn't. The trust boundary is explicit:
 
-- `secret-gate` scans every node against 14 patterns (API keys,
+- **Signed envelopes.** Every outbound node can be wrapped in a
+  device-signed envelope carrying its user-DID authorization chain.
+  Receivers verify the chain offline (three Ed25519 checks, sub-2 ms)
+  and know exactly *which user, which device* produced the claim.
+  Domain-separation tags (`wellinformed-auth:v1:` vs
+  `wellinformed-sig:v1:`) prevent replay of authorization signatures
+  as payload signatures — enforced in `src/domain/identity.ts`.
+- **`secret-gate`** scans every node against 14 patterns (API keys,
   JWT-anchored bearer tokens, private key blocks) before anything
   crosses the wire.
-- `remote-node-validator` rejects malformed or un-timestamped nodes
-  at the boundary with a specific failure code.
-- `shareable: false` on any room in `shared-rooms.json` excludes it
-  from system-room virtual membership too.
-- The interactive `share ui` picker lets you toggle opt-in per room
-  in ~10 seconds, zero-dep.
+- **`remote-node-validator`** rejects malformed or un-timestamped
+  nodes at the boundary with a specific failure code (`FetchedAtMissing`,
+  `UriSchemeNotAllowed`, etc.) — logged on both sides for drift
+  observability.
+- **`shareable: false`** on any room in `shared-rooms.json` excludes
+  it from system-room virtual membership too — the opt-out for
+  sensitive work.
+- **`share ui`** — the interactive picker — toggles opt-in per
+  non-system room in ~10 seconds, zero-dep.
 
 You trust the peers you choose, at the granularity of rooms you
-choose, and the protocol enforces the rest.
+choose, with cryptographic attribution for every claim that reaches
+you, and the protocol enforces the rest.
 
 ### "Why should I believe you won't become another VC-funded SaaS?"
 
@@ -289,7 +314,108 @@ Mirror the hero. Repeat the install command. No risk reversal needed
 
 ---
 
+## Scroll-landing scaffold (5-chapter structure)
+
+Applies the scroll-storyteller framework (hero → 5 chapters
+alternating light/dark → finale) and Lyndon's communication-
+storytelling four-part structure (Headline · Key Points · Proof ·
+CTA) at every beat. Plan backwards from the finale: "a mesh of
+peers, each with their own DID, each holding their own graph,
+federated by protocol not by platform."
+
+### Hero (light, wide) — the contrast
+
+- Headline: **The network before the web.**
+- Subhead: *Your peers already did this research. Your data lives
+  on your machine. Your identity is a keypair you own.*
+- CTA: **Run your own node**
+- Visual: a single peer's graph, with faint edges reaching outward
+  to other graphs in the distance. Wide composition.
+
+### Chapter 1 — the treadmill (dark, contrast)
+
+- Headline: **Every "AI memory" company is building the same silo.**
+- Key points: VC-funded SaaS. Your context in their cloud. LOCOMO
+  benchmarks that contradict each other in their own paper comments.
+  Your identity is a row in their user table.
+- Proof: cite the BENCH-COMPETITORS table. mem0 vs Zep vs MemPalace,
+  three-way benchmark dispute, stars counted from `gh api`, all
+  linked to their own issue trackers.
+- Visual: a monolithic cloud containing every user's data. One
+  center, many spokes. Static.
+
+### Chapter 2 — the shape that refuses it (light)
+
+- Headline: **wellinformed is the opposite shape.**
+- Key points: every node is a peer, runs the same code, answers
+  answers FROM its own graph. No wellinformed server. No directory.
+  Just multiaddrs.
+- Proof: screenshot of `wellinformed peer list` with real peer IDs.
+  MIT license. 396 tests pass. Phase log with commit SHAs.
+- Visual: the same users as chapter 1, now each their own node,
+  edges between them instead of spokes to a center. Motion: soft
+  pulse on each node.
+
+### Chapter 3 — identity you own (dark, turning point)
+
+- Headline: **Your identity is a W3C `did:key`, not a customer record.**
+- Key points: Ed25519 keypair, generated locally, multicodec-prefixed
+  per spec. Device keys authorized by the user DID. Signed envelopes
+  verified offline in under 2 ms. Rotate a compromised device, keep
+  the user DID.
+- Proof: `wellinformed identity show` output — real DID,
+  authorization chain, device pubkey. 38/38 identity tests.
+- Visual: a keypair unfolding from a pair of cryptographic glyphs.
+  Authorization chain as a folded ribbon. Dark background to emphasise
+  the cryptographic primitive.
+
+### Chapter 4 — the retrieval fact (light)
+
+- Headline: **72.30% NDCG@10 on BEIR SciFact. Reproducible.**
+- Key points: full BEIR v1, not LOCOMO. 5,183 docs × 300 queries.
+  CPU-only, 36 ms p50. 75.22% with the optional Rust embedder.
+- Proof: `scripts/bench-beir-sota.mjs scifact --hybrid` one-line
+  reproduction. Link to MTEB leaderboard. Wave 3 (reranker) regressed
+  — we shipped the null result anyway, with root-cause.
+- Visual: a clean bar chart — wellinformed Wave 2 vs bge-base-en
+  vs monoT5-3B. Annotated per visual-storytelling-design rules:
+  "within 2 NDCG of GPU-required SOTA." No cherry-pick, no missing
+  denominators.
+
+### Chapter 5 — join the federation (dark, rising action)
+
+- Headline: **One install to run a node. Two system rooms by default.**
+- Key points: `toolshed` + `research` always-on + the `oracle`
+  bulletin board for peer Q&A. Layer B over libp2p pubsub for
+  real-time. CRDT sync for durability.
+- Proof: GIF of `wellinformed oracle ask "..." --live` on peer A,
+  `wellinformed oracle show <qid>` on peer B within 2 s.
+- Visual: three nodes, questions flowing between them as small
+  glowing dots along the edges. Motion: subtle, continuous.
+
+### Finale (centered symbol) — unity
+
+- No headline. A single symbol: a small mesh of peers, each with a
+  tiny key icon, connected by the three system-room edges. Below
+  the mesh: **Run your own node.** `git clone …`
+- Exit without a recap — the reader either runs the command or
+  doesn't. Don't beg for the install.
+
+### Visual system across all chapters
+
+- Palette: dark = `#0c0c14` base with accent greens / ambers; light
+  = warm off-white with the same accent. Consistent across chapters.
+- Typography: Outfit for display, JetBrains Mono for identity
+  strings + command-line blocks. Lead with insight, not topic.
+- Motion: restrained. One change per scroll beat (visual-storytelling
+  rule: highlight OR annotate, never both).
+- Annotations always on data. No unlabeled comparisons.
+- Integrity: show limitations. Wave 3 / Wave 4 null results stay on
+  the page. Reader earns trust by seeing the disclosure.
+
+---
+
 ## Meta
 
-**Page title (SEO):** wellinformed — federated knowledge graph for AI agents
-**Description:** P2P memory layer for Claude Code, Codex, and any MCP host. Runs on your CPU, federates with peers you trust, 75.22% NDCG@10 on BEIR SciFact. MIT-licensed. No cloud, no subscription, no benchmark theater.
+**Page title (SEO):** wellinformed — the network before the web
+**Description:** The federated knowledge graph for AI agents. Your peers already did this research — wellinformed asks their graphs before your Claude Code session hits the web. Your identity is a W3C did:key you own. MIT-licensed, CPU-local, 75.22% NDCG@10 on BEIR SciFact. No cloud, no subscription.
