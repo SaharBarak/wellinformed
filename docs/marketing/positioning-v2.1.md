@@ -30,30 +30,41 @@ a Series A.*
 
 ## Hero copy — three directions
 
-Pick one. All three land the "peers, not platforms" frame; they
-differ in how direct the enemy-naming is.
+Pick one. All three foreground the "your peers already did this
+research" value prop; they differ in how directly they contrast
+with the VC-funded category.
 
-### Direction A — "your machine, your rules" (recommended default)
+### Direction A — "the network before the web" (recommended default)
 
 > **Headline**
-> Your AI agent's memory shouldn't live in someone else's datacenter.
+> The network before the web.
 
 > **Subheadline**
-> wellinformed is the MCP-native knowledge graph that runs on your
-> CPU, federates with peers you trust, and sends nothing to anyone's
-> cloud. Indexes your research, your codebase, and your peers' shared
-> rooms into one graph. 75.22% NDCG@10 on BEIR SciFact — a retrieval
-> benchmark you can actually reproduce.
+> Your peers already did this research. wellinformed asks their
+> graphs before letting your agent hit the web — their embeddings,
+> their citations, their synthesis flow straight into your Claude Code
+> session. Local-first when you're offline, peer-first when you're
+> online. MCP-native, MIT-licensed, runs on your CPU. No cloud, no
+> subscription, no benchmark theater.
 
-> **Primary CTA:** Install in three commands
+> **Primary CTA:** Run your own node
 > **Secondary CTA:** See the federation protocol
 
-**Why this works:** names the problem (datacenter = someone else's
-server) without naming any competitor, so it reads as principled
-rather than attack-ad. The subheadline stacks three specific claims
-— runs on CPU, federates, reproducible benchmark — each of which is
-a point the VC-funded category actively can't match (SaaS is cloud;
-LOCOMO is LLM-judged; none of them federate).
+**Why this works:** "the network before the web" is the one-line
+claim nobody else in the AI-memory category can make. VC-funded
+memory SaaS locks your context in their silo — by design, my graph
+can't help answer your question and vice versa. wellinformed's
+entire architecture is the opposite: the prefetch hook consults
+connected peers *before* letting Claude reach for WebSearch, and
+the PostToolUse hook saves what Claude did fetch back into a room
+your peers can touch. Research compounds. The network gets smarter
+the more of us run it.
+
+The subheadline lands four specific claims in one paragraph:
+(1) peers already did the work, (2) their embeddings flow direct —
+no vendor broker, (3) graceful fallback to local when offline,
+(4) the "no cloud, no subscription, no benchmark theater" triplet
+rules the VC-funded category out without naming anyone.
 
 ### Direction B — direct enemy-naming (for the launch thread, not the homepage)
 
@@ -112,9 +123,14 @@ Use after the hero. Single idea per column.
 > wellinformed is the opposite shape. Every instance is a peer. Every
 > peer runs the same code. Your graph lives on your CPU; your peers'
 > graphs live on theirs; the P2P layer lets them share rooms without
-> anyone brokering the exchange. The retrieval is measurable — full
-> BEIR, NDCG@10, reproducible with `npm run bench`. The protocol is
-> MIT. The only "platform" is a directory of peer multiaddrs.
+> anyone brokering the exchange. **When your agent needs context it
+> doesn't have, wellinformed checks the peers you trust before it
+> reaches for the web** — their embeddings, their fetched articles,
+> their saved syntheses flow directly into the MCP context Claude
+> reads from. You inherit their research instead of repeating it.
+> The retrieval is measurable — full BEIR, NDCG@10, reproducible with
+> `npm run bench`. The protocol is MIT. The only "platform" is a
+> directory of peer multiaddrs.
 
 ---
 
@@ -122,29 +138,36 @@ Use after the hero. Single idea per column.
 
 Ordered by leverage. Don't soften them.
 
-### 1. Your graph, not theirs.
+### 1. Research that compounds across everyone running it.
+
+When a peer you trust has already investigated the topic, their
+graph — embeddings, citations, tunnels across related subjects —
+flows straight into your Claude Code session. No Google, no
+re-embedding, no "let me read this one more time." You inherit the
+finished work. The more developers on the network, the less research
+anyone has to redo — and nobody needs a vendor's permission for the
+compounding to happen.
+
+### 2. Your graph, not theirs.
 
 Every node is embedded locally. Every query hits your SQLite file
-first. The network layer opens only when you explicitly share a room
-or subscribe to the oracle topic. There is no wellinformed server —
-nobody to buy out, nobody to shut down, nobody to raise prices.
-
-### 2. Peer-to-peer without platform capture.
-
-Three always-on system rooms (`toolshed`, `research`, `oracle`) every
-peer advertises out of the box. Questions you post land in peers'
-graphs within seconds via libp2p pubsub. Answers flow back the same
-way. No DHT provider, no signaling service — just multiaddrs and the
-code you're already running.
+first, connected peers second, the open web last. The network layer
+opens only for rooms you explicitly share or the always-on system
+rooms you opt into. There is no wellinformed server — nobody to buy
+out, nobody to shut down, nobody to raise prices. Three system rooms
+(`toolshed`, `research`, `oracle`) every peer advertises by default;
+every other room is negotiable room-by-room via the interactive
+share picker.
 
 ### 3. Benchmarks you can reproduce.
 
 72.30% NDCG@10 on full BEIR SciFact (5,183 docs × 300 queries). 75.22%
 with the optional Rust embedder. These are measured against
 standardized datasets, not LLM-as-judge. Run them yourself with one
-command. Compare to the VC-funded category's LOCOMO scores — we
-publish ours against the benchmark the academic community uses,
-because we don't need to obscure what the number means.
+command. The VC-funded category publishes LOCOMO scores that contradict
+each other in their own paper comments — we publish NDCG@10 on the
+benchmark the academic community uses, because we don't need to
+obscure what the number means.
 
 ---
 
