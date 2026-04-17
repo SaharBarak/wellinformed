@@ -260,6 +260,31 @@ Not a retrieval benchmark — infrastructure that makes the memory user-owned ra
 
 **Why this matters for the v3 release:** the portable cross-model memory story only closes when the memory entries themselves are cryptographically bound to the user, not the device. The DID wave is the foundation layer; everything else (federated search, CRDT room sync, shared memory) builds on top.
 
+### 2i. PPR graph-rerank gate — NULL on single-hop SciFact (Phase 32)
+
+**Hypothesis:** adding a personalized-PageRank rerank layer over a doc-doc kNN graph lifts NDCG@10 on top of dense+hybrid retrieval, matching the HippoRAG-2 (NeurIPS 2024) single-hop-rerank behavior.
+
+**Result:**
+
+| Stage | NDCG@10 | R@10 | MRR |
+|-------|---------|------|-----|
+| dense (top-100) | 70.01% | 82.71% | 0.6716 |
+| + PPR rerank (k=5 kNN, α=0.85, 50 iter) | 46.25% | 73.83% | 0.3913 |
+| Δ | **−23.76pt** | −8.88pt | −0.2803 |
+
+**Verdict: NULL.** PPR regresses by 23.76pt on single-hop BEIR SciFact.
+
+**Why the regression happens (mechanistic):** PPR diffuses the top-100 initial scores over the kNN graph. On single-hop retrieval, the initial dense stage has already ranked the *relevant* documents highest. Diffusion leaks mass from relevant docs to their nearest neighbors (which are *not* relevant in single-hop BEIR by construction — SciFact's qrels mark specific passages, not topical neighborhoods). The relevant docs drop in rank; the rerank destroys quality.
+
+**Why this was expected:** HippoRAG-2's reported +5–14% improvements are on **multi-hop QA benchmarks** (MuSiQue, HotpotQA), where the relevant answer requires traversing relationships between docs. Single-hop BEIR has no relationship structure for PPR to exploit. The published paper's single-hop ablation also shows near-zero or regressing deltas.
+
+**What ships anyway:**
+- `src/domain/pagerank.ts` — pure PPR primitive with dangling-node fixup + kNN graph builder + 12 tests green
+- `src/domain/shamir.ts` — GF(2⁸) Shamir secret sharing (pure, no deps) + 14 tests green — unrelated to PPR, shipped in the same primitives wave for v3 social recovery (ADR-001, Non-decisions table)
+- `scripts/bench-ppr.mjs` — the gate that measured the null
+
+**Promotion criteria for v3.2:** run the same PPR primitive against MuSiQue + HotpotQA (multi-hop datasets). If PASS (+3pt NDCG@10 or equivalent R@5 lift), ship as a rerank path triggered by a `multi_hop: true` query flag. If NULL on multi-hop too, park the primitive and document the space more carefully.
+
 ### Wave 2 — reproducible numbers
 
 #### BEIR SciFact (5,183 × 300)
