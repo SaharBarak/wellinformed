@@ -273,13 +273,22 @@ Zero new runtime dependencies — all v4 primitives use Node stdlib + the existi
 
 Explicitly deferred from v4.0:
 
+**Shipped post-rc1 in this session** (commits 86de002, b19b97e, 28cd666):
+
+- **L2 semantic query cache** — paraphrase-aware lookup catches the 30-50% of queries the L1 hash cache misses (`src/domain/semantic-cache.ts`). Cosine threshold 0.92, embed-once-route-twice on miss. Wired into the daemon ask handler; cache-stats reports both layers.
+- **HippoRAG-2 multi-hop PPR bench skeleton** — algorithmic harness (`scripts/bench-ppr-multihop.mjs`) reuses `src/domain/pagerank.ts` over a localized doc-doc kNN graph. Synthetic mode validates pipeline; `--dataset hotpotqa|musique` is the path to the real gate.
+- **Browser/WASM portability for the domain layer** — `src/domain/{binary-quantize, semantic-cache, query-cache, vectors}.ts` certified zero `node:` imports. `query-cache` swapped from `node:crypto` to `@noble/hashes` (pure JS, transitive via `@scure/bip39`). Fitness contract enforced by `tests/browser-portability.test.ts`.
+- **SignedShareableNode envelope primitive** — `src/domain/share-envelope.ts` builds on the identity primitive to wrap each ShareableNode in a verifiable Ed25519 envelope chain. Sign/verify roundtrip + 9 tamper-detection tests pass; wiring into the share-sync inbound observer ships behind `WELLINFORMED_REQUIRE_SIGNED_NODES` in a follow-up commit.
+
+**Still deferred:**
+
 - **v4.1 — Native binary client** (Rust `wellinformed-cli` that speaks the IPC protocol directly, bypassing Node boot). Target: warm-hit latency 100ms → 15ms.
 - **v4.1 — BIP39 mnemonic recovery** — adds `@scure/bip39` (40 KB audited dep) for human-readable 12/24-word phrases. Hex format remains supported.
-- **v4.2 — HippoRAG-2 multi-hop PPR gate** — measure `src/domain/pagerank.ts` against MuSiQue + HotpotQA. If +3pt NDCG@10 or +5pt R@5, enable `multi_hop: true` flag on MCP queries.
+- **v4.2 — Real-data PPR gate** — wire `scripts/bench-ppr-multihop.mjs` to BEIR HotpotQA + MuSiQue corpora. If +3pt NDCG@10 or +5pt R@5, enable `multi_hop: true` flag on MCP queries.
 - **v4.2 — Contextual Retrieval with a larger local LLM** — current null was measured with Qwen2.5-0.5B (too small). Retry with Qwen3 or Llama-3.2 once their embedding-pair ONNX ports are validated.
 - **v4.2 — Cross-encoder rerank with domain-matched models** — bge-reranker-v2-m3, jina-reranker-v2 — both untested in our pipeline.
-- **v4.3 — WASM browser runtime** — same Rust core compiled to WASM for in-browser peers.
-- **v4.3 — CRDT-aware envelope verification on inbound updates** — the receive-side complement to §5.6.
+- **v4.2 — Wire `WELLINFORMED_REQUIRE_SIGNED_NODES` into share-sync inbound observer** — the receive-side complement to §5.6, using the now-shipped envelope primitive.
+- **v4.3 — WASM browser runtime** — Rust core compiled to WASM for in-browser peers. The TS domain layer is already browser-portable (this session); WASM is for the high-throughput sqlite-vec/HNSW path.
 
 ---
 

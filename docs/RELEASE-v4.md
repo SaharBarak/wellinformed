@@ -196,18 +196,23 @@ To pre-empt the obvious misreadings:
 
 ## Cumulative regression
 
-**308 tests green** across **93 suites**:
-- New domain primitives: `binary-quantize`, `consolidated-memory`, `query-cache`, `pagerank`, `shamir`, `bloom`, `log-event`, `release`, `identity` (162 tests)
-- New application / infrastructure: `consolidator`, `identity-lifecycle`, `identity-bridge`, `log-store`, `release/update-checker`, `embedder-batching`, `vector-index-binary`, `ipc`, `ipc-handlers` (60+ tests)
-- Existing phase regressions (Phase 1 through Phase 38) all untouched
+**638 tests green** across **159 suites** (full-suite run, 8.7 min, one pre-existing flaky rust-embed test cancelled — unrelated):
+- Domain primitives: `binary-quantize`, `consolidated-memory`, `query-cache`, `semantic-cache`, `share-envelope`, `pagerank`, `shamir`, `bloom`, `log-event`, `release`, `identity` (190+ tests)
+- Application / infrastructure: `consolidator`, `identity-lifecycle`, `identity-bridge`, `log-store`, `release/update-checker`, `embedder-batching`, `vector-index-binary`, `ipc`, `ipc-handlers` (60+ tests)
+- Browser/WASM portability fitness contract (6 tests) — fails CI if anyone reintroduces a `node:` import to the domain layer
+- Existing phase regressions (Phase 1 through Phase 39) all untouched
 
-**Zero new runtime dependencies.** Ollama is a separate local process (not a JS import); everything else is stdlib + the existing v3 dep graph.
+**One new runtime dependency in this wave**: `@noble/hashes` (was transitive via `@scure/bip39`, now a direct import for browser-portability of `query-cache`). Ollama remains a separate local process; everything else is stdlib + the existing v3 dep graph.
 
 ---
 
 ## Commits (v4 wave, reverse chronological)
 
 ```
+28cd666  feat(identity): SignedShareableNode envelope primitive — sign/verify CRDT nodes
+b19b97e  feat(domain): browser/WASM portability — zero node: imports in domain layer
+86de002  feat(cache): L2 semantic query cache + HippoRAG-2 multi-hop bench skeleton
+e156e23  feat(daemon): IPC delegation — `ask` through warm daemon, 3.2× speedup
 92f797d  feat(embedder): Phase 2 — coalescing batch decorator, 2.9–9.9× indexing throughput
 6eeea44  feat(cache): Phase 5 — L1 query cache on daemon IPC, 3× speedup on repeats
 6d7ec77  feat(bench): consolidation gate — storage shrinkage + quality proxy
@@ -217,7 +222,6 @@ f6ab7f1  feat(domain): consolidated-memory primitive — clusters + provenance
 09223d1  feat(runtime): WELLINFORMED_VECTOR_QUANTIZATION env var + search dispatch
 b16a93a  feat(vector-index): binary-quantized storage + searchHybridBinary
 1e609a6  feat(domain): binary-quantize primitive — Matryoshka slice + sign-bit pack + Hamming
-e156e23  feat(daemon): IPC delegation — `ask` through warm daemon, 3.2× speedup
 ```
 
 Plus the v3 wave (identity, bridge, bloom, pagerank, shamir, log, release — all in the prior session).
