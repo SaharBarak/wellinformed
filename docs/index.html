@@ -1486,7 +1486,8 @@
       const beamLayer = new THREE.Group();
       sceneRoot.add(beamLayer);
 
-      let activeBeam = null; // { dashGroup, packet, packetGlow, material, startTime, phase }
+      let activeBeam = null;   // single return beam (peer → alice) during phase D
+      let activeBeams = [];    // N outbound broadcast beams (alice → every peer) during phase B
 
       function clearBeam() {
         while (beamLayer.children.length) {
@@ -1500,6 +1501,7 @@
           });
         }
         activeBeam = null;
+        activeBeams = [];
       }
 
       function buildBeam(from, to) {
@@ -1589,11 +1591,26 @@
           statusEl.classList.remove('show');
           return;
         }
-        const peerLabel = SCENARIOS[scenarioIdx].peer;
-        if (phase === 'A_typing' || phase === 'B_question' || phase === 'C_research') {
+        const peerCount = peers.length;
+        if (phase === 'A_typing') {
           statusEl.innerHTML =
             '<span class="viz-st-label">asking:</span>' +
             '<span class="viz-st-q">"' + scenario.q + '"</span>';
+          statusEl.classList.add('show');
+        } else if (phase === 'B_question') {
+          statusEl.innerHTML =
+            '<span class="viz-st-label">broadcasting to</span>' +
+            '<span class="viz-st-conf">' + peerCount + '</span>' +
+            '<span class="viz-st-label">peer(s) over</span>' +
+            '<span class="viz-st-peer">/wellinformed/oracle/1.0.0</span>';
+          statusEl.classList.add('show');
+        } else if (phase === 'C_research') {
+          statusEl.innerHTML =
+            '<span class="viz-st-label">network: </span>' +
+            '<span class="viz-st-conf">1</span>' +
+            '<span class="viz-st-label">match ·</span>' +
+            '<span class="viz-st-label">' + (peerCount - 1) + '</span>' +
+            '<span class="viz-st-label">passed</span>';
           statusEl.classList.add('show');
         } else if (phase === 'D_answer' || phase === 'E_absorb') {
           statusEl.innerHTML =
@@ -1605,7 +1622,6 @@
             '<span class="viz-st-label">' + scenario.age + '</span>';
           statusEl.classList.add('show');
         } else if (phase === 'F_settle') {
-          // keep text, fade out handled via CSS (opacity) — here we just drop it after a bit
           statusEl.classList.remove('show');
         }
       }
@@ -1711,71 +1727,120 @@
         aliceCore.scale.setScalar(aliceScale);
         aliceHalo.material.opacity = haloOpacity;
 
-        // Phase B — question beam goes out
+        // Phase B — BROADCAST: one beam to every peer simultaneously
+        // (matches the real oracle_ask --live + gossipsub semantics — question
+        // fans out to the whole topic, every subscriber receives it)
         if (ph.name === 'B_question') {
-          if (!activeBeam) {
-            activeBeam = buildBeam(new THREE.Vector3(0, 0, 0.3), currentPeer.pos.clone().setZ(0.3));
-            activeBeam.direction = 'outbound';
+          if (activeBeams.length === 0) {
+            for (const peer of peers) {
+              const b = buildBeam(new THREE.Vector3(0, 0, 0.3), peer.pos.clone().setZ(0.3));
+              b.direction = 'outbound';
+              b.peer = peer;
+              activeBeams.push(b);
+            }
           }
           const t = easeOutCubic(ph.local);
-          activeBeam.dashMat.opacity = 0.55 * Math.min(1, ph.local * 2);
-          // packet travels from 0 → to
-          const p = new THREE.Vector3().lerpVectors(activeBeam.from, activeBeam.to, t);
-          activeBeam.core.position.copy(p);
-          activeBeam.glow.position.copy(p);
-          activeBeam.core.material.opacity = 1;
-          activeBeam.glow.material.opacity = 0.55;
+          for (const b of activeBeams) {
+            b.dashMat.opacity = 0.42 * Math.min(1, ph.local * 2);
+            const p = new THREE.Vector3().lerpVectors(b.from, b.to, t);
+            b.core.position.copy(p);
+            b.glow.position.copy(p);
+            b.core.material.opacity = 0.95;
+            b.glow.material.opacity = 0.4;
+          }
           setStatus({ phase: ph.name, scenario: currentScenario });
         }
 
-        // Phase C — peer researches: enlarge + sub-graph lights in sequence
+        // Phase C — EVALUATE across the network: every peer "reads" the question.
+        // Non-matching peers do a quick pulse then settle (shake head, in effect).
+        // Only the matching peer (currentPeer) enters full research mode —
+        // sub-graph lighting up in sequence as it assembles the answer.
         if (ph.name === 'C_research') {
-          // fade question beam out
-          if (activeBeam) {
-            const fadeT = Math.min(1, ph.local * 4);
-            activeBeam.dashMat.opacity = 0.55 * (1 - fadeT);
-            activeBeam.core.material.opacity = (1 - fadeT);
-            activeBeam.glow.material.opacity = 0.55 * (1 - fadeT);
-            if (fadeT >= 1) clearBeam();
-          }
-          // enlarge peer
-          const pulse = 1 + 0.22 * Math.sin(ph.local * Math.PI);
-          currentPeer.mesh.scale.setScalar(pulse);
-          // light up peer itself toward alice accent
-          const peerBlend = 0.5 + 0.5 * Math.sin(ph.local * Math.PI);
-          currentPeer.mesh.material.color.lerpColors(COL.peer, COL.alice, peerBlend * 0.55);
-
-          // sequential sub-graph nodes
-          const subs = currentPeer.subNodes;
-          const stagger = 0.3; // seconds between nodes
-          const subDur = 0.6;  // lit duration
-          for (let i = 0; i < subs.length; i++) {
-            const tStart = i * stagger;
-            const tEnd = tStart + subDur;
-            const tNow = ph.local * ph.dur;
-            if (tNow >= tStart && tNow <= tEnd + 0.3) {
-              const local = Math.min(1, (tNow - tStart) / subDur);
-              const bright = Math.sin(local * Math.PI); // rise and fall
-              subs[i].material.color.lerpColors(COL.peer, COL.alice, bright);
-              subs[i].material.opacity = 0.75 + 0.25 * bright;
-              subs[i].mesh.scale.setScalar(1 + 0.35 * bright);
-
-              // light edge into this node if exists
-              const edge = currentPeer.subEdges[i - 1] || currentPeer.subEdges[i];
-              if (edge) {
-                edge.active.opacity = 0.75 * bright;
+          // fade the broadcast beams out quickly
+          if (activeBeams.length > 0) {
+            const fadeT = Math.min(1, ph.local * 3);
+            for (const b of activeBeams) {
+              b.dashMat.opacity = 0.42 * (1 - fadeT);
+              b.core.material.opacity = 0.95 * (1 - fadeT);
+              b.glow.material.opacity = 0.4 * (1 - fadeT);
+            }
+            if (fadeT >= 1) {
+              // keep activeBeams list reference cleared but don't wipe sub-graphs
+              while (beamLayer.children.length) {
+                const c = beamLayer.children.pop();
+                c.traverse?.((o) => {
+                  if (o.geometry) o.geometry.dispose();
+                  if (o.material) {
+                    if (Array.isArray(o.material)) o.material.forEach(m => m.dispose());
+                    else o.material.dispose();
+                  }
+                });
               }
-            } else {
-              subs[i].material.color.copy(COL.peer);
-              subs[i].material.opacity = 0.75;
-              subs[i].mesh.scale.setScalar(1);
+              activeBeams = [];
             }
           }
+
+          // Every peer's "evaluation" pulse — a quick brighten-then-dim in
+          // the first 0.5 s of phase C. Gives the network-scan feel without
+          // claiming each peer has the answer.
+          const evalT = Math.min(1, ph.local * 2);      // 0 → 1 over first 50% of phase
+          const evalPulse = Math.sin(evalT * Math.PI);  // rise-fall
+          for (const peer of peers) {
+            if (peer === currentPeer) continue;
+            // non-matching peers: brief white-ish glow, then sink back to gray
+            const dim = 1 - evalT;                      // fade out after evaluation
+            peer.mesh.material.color.lerpColors(COL.peer, COL.mine, evalPulse * 0.45);
+            peer.mesh.material.opacity = 1;
+            peer.mesh.scale.setScalar(1 + 0.08 * evalPulse);
+            // faint ghost of their sub-graph (evaluating their own index)
+            peer.subNodes.forEach(s => {
+              s.material.opacity = 0.75 - 0.35 * dim * 0;  // keep idle
+              s.material.color.lerpColors(COL.peer, COL.mine, evalPulse * 0.3);
+              s.mesh.scale.setScalar(1 + 0.1 * evalPulse);
+            });
+          }
+
+          // The matching peer — full research mode starts AFTER the eval pulse
+          // so the timing reads as "all peers look, one finds it, works on it."
+          const researchStart = 0.5; // seconds into phase C
+          const researchLocalT = Math.max(0, (ph.local * ph.dur - researchStart) / (ph.dur - researchStart));
+          if (researchLocalT > 0) {
+            const pulse = 1 + 0.24 * Math.sin(researchLocalT * Math.PI);
+            currentPeer.mesh.scale.setScalar(pulse);
+            const peerBlend = 0.5 + 0.5 * Math.sin(researchLocalT * Math.PI);
+            currentPeer.mesh.material.color.lerpColors(COL.peer, COL.alice, peerBlend * 0.6);
+
+            // sub-graph nodes light in sequence while this peer "reasons"
+            const subs = currentPeer.subNodes;
+            const stagger = 0.3;
+            const subDur = 0.6;
+            const researchDur = (ph.dur - researchStart);
+            const tNow = researchLocalT * researchDur;
+            for (let i = 0; i < subs.length; i++) {
+              const tStart = i * stagger;
+              const tEnd = tStart + subDur;
+              if (tNow >= tStart && tNow <= tEnd + 0.3) {
+                const local = Math.min(1, (tNow - tStart) / subDur);
+                const bright = Math.sin(local * Math.PI);
+                subs[i].material.color.lerpColors(COL.peer, COL.alice, bright);
+                subs[i].material.opacity = 0.75 + 0.25 * bright;
+                subs[i].mesh.scale.setScalar(1 + 0.38 * bright);
+                const edge = currentPeer.subEdges[i - 1] || currentPeer.subEdges[i];
+                if (edge) edge.active.opacity = 0.8 * bright;
+              } else if (tNow > tEnd + 0.3) {
+                subs[i].material.color.copy(COL.peer);
+                subs[i].material.opacity = 0.75;
+                subs[i].mesh.scale.setScalar(1);
+              }
+            }
+          }
+          setStatus({ phase: ph.name, scenario: currentScenario });
         } else {
           // reset peer states when outside phase C
           peers.forEach(p => {
             p.mesh.scale.setScalar(1);
             p.mesh.material.color.copy(COL.peer);
+            p.mesh.material.opacity = 1;
             p.subNodes.forEach(s => {
               s.material.color.copy(COL.peer);
               s.material.opacity = 0.75;
