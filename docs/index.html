@@ -802,10 +802,10 @@
       </a>
       <div class="nav-links">
         <a href="#silo">The treadmill</a>
-        <a href="#shape">Peer shape</a>
-        <a href="#identity">DID identity</a>
+        <a href="#shape">The alternative</a>
+        <a href="#identity">Identity</a>
         <a href="#bench">Benchmark</a>
-        <a href="#rooms">System rooms</a>
+        <a href="#rooms">How to join</a>
       </div>
       <a class="nav-cta" href="https://github.com/SaharBarak/wellinformed">
         github.com/SaharBarak/wellinformed
@@ -877,9 +877,10 @@
             building the same <em>silo</em>.
           </h2>
           <p class="chap-intro hush" data-reveal style="--d: 2">
-            VC-funded SaaS. Your context in their cloud. LOCOMO benchmarks
-            that contradict each other in the paper's own comments. Your
-            identity is a row in their user table.
+            VC-funded SaaS. Your context in their cloud. Benchmark
+            numbers that contradict each other &mdash; every vendor
+            picks a winner, then the next vendor says their math is
+            wrong. Your identity is a row in their user table.
           </p>
         </div>
 
@@ -913,7 +914,7 @@
               <span class="ct-name">MemPalace</span>
               <span class="ct-stars">44,088</span>
               <span class="ct-claim">96.6% R@5 / 100% reranked</span>
-              <span class="ct-verdict dispute">Inflated per #214</span>
+              <span class="ct-verdict dispute">Disputed</span>
             </div>
             <div class="ct-row">
               <span class="ct-name">Mastra</span>
@@ -923,11 +924,12 @@
             </div>
           </div>
           <p class="silo-note hush" data-reveal style="--d: 3">
-            Every number above was published by the vendor. Every dispute
-            was filed by another vendor. Three stacks, three interpretations
-            of the same evaluation set. Verified via
-            <code class="mono">gh api</code> and each project's own issue tracker in
-            <code class="mono">.planning/BENCH-COMPETITORS.md</code>.
+            Every number above is self-reported. Every dispute was filed
+            by a competing vendor against another. Three products, three
+            different ways of scoring the same test. You can read each
+            paper and pick a winner &mdash; or skip the argument and
+            measure retrieval yourself on a benchmark nobody in this
+            table can dispute.
           </p>
         </div>
       </div>
@@ -955,11 +957,11 @@
           <div class="pillars">
             <div class="pillar">
               <h3>Every node is a peer.</h3>
-              <p>No wellinformed server. No directory service. No signaling provider. Just ed25519 identities and multiaddrs.</p>
+              <p>No wellinformed server. No directory service. No signaling provider. You and your peers <i>are</i> the network &mdash; there's no other infrastructure to go down, get acquired, or change its pricing.</p>
             </div>
             <div class="pillar">
               <h3>Every peer runs the same code.</h3>
-              <p>MIT-licensed, 21 MCP tools, 396 tests. The binary you run is the binary your peers run. No client/server asymmetry.</p>
+              <p>MIT-licensed. The binary you run is the binary your peers run. No client/server split, no premium tier, no &ldquo;cloud version.&rdquo;</p>
             </div>
             <div class="pillar">
               <h3>Research compounds across peers.</h3>
@@ -987,10 +989,11 @@
             not a customer record.
           </h2>
           <p class="chap-intro hush" data-reveal style="--d: 2">
-            Generated locally at first boot. Ed25519 keypair, 32-byte pubkey,
-            multicodec-prefixed per the W3C spec. The user DID is long-lived
-            and survives device changes — rotate a compromised device, keep
-            the identity, never email support.
+            Your identity is a standards-based public key, generated on
+            your own machine the first time you run wellinformed. It
+            survives every device you ever use. Lose a laptop? Rotate the
+            device key, keep the identity. Nobody ever emails support
+            because nobody operates &ldquo;support.&rdquo;
           </p>
         </div>
 
@@ -1011,22 +1014,22 @@
             <div class="id-point">
               <span class="id-num">01</span>
               <div>
-                <b>Device authorization chain.</b>
-                <p>User signs (device_id, device_pub, authorized_at). Devices are revocable without losing the user DID — rotate a compromised laptop, keep the identity.</p>
+                <b>Your devices, your call.</b>
+                <p>Authorize a new laptop, revoke a stolen phone. Each device gets a key your user identity signs. Compromise a device and the rest of your identity stays intact.</p>
               </div>
             </div>
             <div class="id-point">
               <span class="id-num">02</span>
               <div>
-                <b>Signed envelopes at the wire.</b>
-                <p>Every outbound node — memory entry, oracle answer, room share — can be wrapped and verified offline. Three Ed25519 checks, sub-2 ms, zero DID-resolver calls.</p>
+                <b>Every claim is signed at the source.</b>
+                <p>When a peer sends you an answer, their device signed it &mdash; you can verify in under 2&nbsp;ms, offline, without asking any server who they are. Impersonation isn't a trust problem; it's a cryptographic one.</p>
               </div>
             </div>
             <div class="id-point">
               <span class="id-num">03</span>
               <div>
-                <b>Canonical JSON, zero new crypto deps.</b>
-                <p>Key-sorted deterministic encoding — byte-identical across Node versions and architectures. Pure <code class="mono" style="color:var(--accent)">node:crypto</code> PKCS8/SPKI paths, 641 lines of auditable domain code.</p>
+                <b>Nothing exotic under the hood.</b>
+                <p>Standard Ed25519 keys, deterministic JSON encoding, the runtime's built-in crypto. No custom curve, no new dependency, nothing you can't audit yourself in an afternoon.</p>
               </div>
             </div>
           </div>
@@ -1047,9 +1050,11 @@
             Reproducible.
           </h2>
           <p class="chap-intro hush" data-reveal style="--d: 2">
-            Full BEIR v1, not LOCOMO LLM-as-judge. 5,183 documents × 300
-            queries. CPU-only, 36 ms p50. 75.22% with the optional Rust
-            embedder. Run it yourself.
+            We score retrieval the way the academic leaderboard does:
+            5,183 documents, 300 queries, the full BEIR benchmark &mdash;
+            not an LLM judging another LLM's answers. CPU-only, 36 ms
+            median latency. Clone the repo, run one command, confirm
+            the number yourself.
           </p>
           <div class="bench-annotation" data-reveal style="--d: 3">
             within 2 NDCG of GPU-required SOTA
@@ -1064,12 +1069,12 @@
               <span class="bench-val">64.82%</span>
             </div>
             <div class="bench-row us" data-reveal style="--d: 4">
-              <span><b>wellinformed Wave 2</b></span>
+              <span><b>wellinformed (default)</b></span>
               <div class="bench-bar" style="--w: 72.3%"></div>
               <span class="bench-val" style="color:#0f6a46">72.30%</span>
             </div>
             <div class="bench-row us" data-reveal style="--d: 5">
-              <span><b>+ Rust bge-base</b></span>
+              <span><b>wellinformed (+ Rust embedder)</b></span>
               <div class="bench-bar" style="--w: 75.2%"></div>
               <span class="bench-val" style="color:#0f6a46">75.22%</span>
             </div>
@@ -1091,13 +1096,12 @@
           </p>
 
           <div class="bench-disclose" data-reveal style="--d: 9">
-            <b>Honest disclosure.</b> Wave 3 (adding <code class="mono">bge-reranker-base</code>)
-            regressed quality by 1.9 NDCG and added 25.9 s of latency — kept
-            in the repo with root-cause analysis. Wave 4 (room-aware routing)
-            produced a null result; oracle routing beat flat hybrid by only
-            +0.34 NDCG on CQADupStack. Both documented in
-            <code class="mono">.planning/BENCH-v2.md</code>. We publish null
-            results because we don't need to obscure what the number means.
+            <b>What didn't work.</b> We tried two other approaches and
+            both failed &mdash; an extra reranking step that made results
+            <i>worse</i>, and a room-based routing scheme that barely
+            moved the score. Both are still in the codebase, measured
+            and annotated. We publish the failures because the hard
+            part of retrieval is knowing what you can't claim.
           </div>
         </div>
       </div>
@@ -1116,11 +1120,13 @@
             Out of the box.
           </h2>
           <p class="chap-intro hush" data-reveal style="--d: 2">
-            No opt-in, no manual sharing. Virtual membership is derived from
-            each node's <code class="mono" style="color:var(--accent)">source_uri</code>
-            scheme — a git commit tagged <code class="mono" style="color:var(--accent)">room: wellinformed-dev</code>
-            still shows up in <code class="mono" style="color:var(--accent)">toolshed</code> for peers. Age-aware
-            freshness built in.
+            No opt-in, no manual sharing. wellinformed sorts each piece
+            of content you have into the right room automatically &mdash;
+            a git commit, a paper, a web page, a saved note all land
+            where they belong. Peers see what you know about tools,
+            research, and open questions without you curating anything.
+            Age-aware: older material is flagged so your agent knows
+            when to refresh.
           </p>
         </div>
 
@@ -1138,7 +1144,7 @@
             </div>
             <div class="room">
               <span class="room-name">oracle</span>
-              <span class="room-desc">Q&amp;A bulletin board — questions and answers propagate via touch + CRDT + pubsub</span>
+              <span class="room-desc">Post a question, reach every connected peer in real time &mdash; answers flow back through the same pipe</span>
               <span class="room-stale">stale after 14d</span>
             </div>
           </div>
