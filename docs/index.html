@@ -1482,6 +1482,67 @@
         };
       });
 
+      // ───── peer-to-peer mesh edges ─────
+      // The network is a mesh, not a star. Each peer holds direct libp2p
+      // connections to a handful of other peers — this is how gossipsub
+      // propagates in the real wire (flood to direct peers, each flood to
+      // theirs). Drawing these makes the topology legible. Sparse edges so
+      // it doesn't become a hairball: each peer links to its 2 nearest
+      // neighbours plus one "long-haul" edge to break the ring.
+      const peerLinks = [];
+      {
+        const n = peers.length;
+        const added = new Set();
+        const key = (a, b) => (a < b ? `${a}-${b}` : `${b}-${a}`);
+        for (let i = 0; i < n; i++) {
+          const dists = [];
+          for (let j = 0; j < n; j++) {
+            if (i === j) continue;
+            dists.push({ j, d: peers[i].pos.distanceTo(peers[j].pos) });
+          }
+          dists.sort((a, b) => a.d - b.d);
+          // 2 nearest neighbours
+          for (const { j } of dists.slice(0, 2)) {
+            if (added.has(key(i, j))) continue;
+            added.add(key(i, j));
+            peerLinks.push({ a: i, b: j });
+          }
+          // one long-haul — the farthest peer, so the mesh isn't just a ring
+          const far = dists[dists.length - 1];
+          if (far && !added.has(key(i, far.j))) {
+            added.add(key(i, far.j));
+            peerLinks.push({ a: i, b: far.j, long: true });
+          }
+        }
+
+        for (const link of peerLinks) {
+          const pa = peers[link.a].pos;
+          const pb = peers[link.b].pos;
+          // 8-segment dashed so the mesh reads as "live" connections, not
+          // solid rails — matches the broadcast beam vocabulary but much
+          // dimmer so it stays background.
+          const segCount = 8;
+          const segs = [];
+          const mIdle = new THREE.LineBasicMaterial({
+            color: COL.edge,
+            transparent: true,
+            opacity: link.long ? 0.055 : 0.08,
+          });
+          for (let s = 0; s < segCount; s++) {
+            const t0 = s / segCount;
+            const t1 = t0 + (0.55 / segCount);
+            const p0 = new THREE.Vector3().lerpVectors(pa, pb, t0).setZ(-0.05);
+            const p1 = new THREE.Vector3().lerpVectors(pa, pb, t1).setZ(-0.05);
+            const geom = new THREE.BufferGeometry().setFromPoints([p0, p1]);
+            const l = new THREE.Line(geom, mIdle);
+            sceneRoot.add(l);
+            segs.push(l);
+          }
+          link.material = mIdle;
+          link.segs = segs;
+        }
+      }
+
       // ───── question/answer beam layer ─────
       const beamLayer = new THREE.Group();
       sceneRoot.add(beamLayer);
@@ -1729,7 +1790,9 @@
 
         // Phase B — BROADCAST: one beam to every peer simultaneously
         // (matches the real oracle_ask --live + gossipsub semantics — question
-        // fans out to the whole topic, every subscriber receives it)
+        // fans out to the whole topic, every subscriber receives it). Peer-to-
+        // peer mesh edges also pulse to show gossipsub flood across direct
+        // libp2p connections.
         if (ph.name === 'B_question') {
           if (activeBeams.length === 0) {
             for (const peer of peers) {
@@ -1748,7 +1811,23 @@
             b.core.material.opacity = 0.95;
             b.glow.material.opacity = 0.4;
           }
+          // gossipsub flood on peer-to-peer mesh edges — brighten briefly
+          // so the viewer reads that the question is also relaying between
+          // peers, not just arriving at each on its own beam.
+          const meshPulse = Math.sin(Math.min(1, ph.local * 1.4) * Math.PI);
+          for (const link of peerLinks) {
+            const baseOp = link.long ? 0.055 : 0.08;
+            link.material.opacity = baseOp + (0.25 * meshPulse);
+            link.material.color.lerpColors(COL.edge, COL.alice, meshPulse * 0.5);
+          }
           setStatus({ phase: ph.name, scenario: currentScenario });
+        } else {
+          // outside phase B, restore peer-link edges to their idle state
+          for (const link of peerLinks) {
+            const baseOp = link.long ? 0.055 : 0.08;
+            link.material.opacity = baseOp;
+            link.material.color.copy(COL.edge);
+          }
         }
 
         // Phase C — EVALUATE across the network: every peer "reads" the question.
