@@ -309,17 +309,69 @@
       margin: 0 auto;
       width: 100%;
     }
-    .hero-viz svg {
+    /* ───── hero Three.js scene ───── */
+    .viz-canvas {
+      position: absolute;
+      inset: 0;
       width: 100%;
       height: 100%;
-      overflow: visible;
+      display: block;
+      will-change: transform;
     }
-    .node-core { fill: var(--accent); }
-    .node-mine { fill: #e8e8ed; }
-    .node-peer { fill: var(--ink-mute); }
-    .edge      { stroke: var(--border-dark); stroke-width: 1; fill: none; }
-    .edge-live { stroke: var(--accent); stroke-width: 1.2; fill: none; stroke-dasharray: 4 4; animation: dash-flow 14s linear infinite; }
-    @keyframes dash-flow { to { stroke-dashoffset: -80; } }
+    .viz-status {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      right: 6px;
+      font-family: var(--mono);
+      font-size: 11px;
+      line-height: 1.5;
+      color: #c7c7d0;
+      pointer-events: none;
+      z-index: 2;
+      letter-spacing: 0.01em;
+      opacity: 0;
+      transition: opacity 0.6s var(--ease);
+    }
+    .viz-status.show { opacity: 1; }
+    .viz-status .viz-st-label {
+      color: var(--ink-mute);
+      margin-right: 0.45em;
+    }
+    .viz-status .viz-st-q { color: #e8e8ed; }
+    .viz-status .viz-st-peer { color: var(--accent); }
+    .viz-status .viz-st-conf { color: var(--accent-warm); }
+    .viz-tooltip {
+      position: absolute;
+      pointer-events: none;
+      transform: translate(-50%, calc(-100% - 10px));
+      padding: 5px 9px;
+      border: 1px solid var(--border-dark);
+      background: rgba(12, 12, 20, 0.92);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 6px;
+      font-family: var(--mono);
+      font-size: 10.5px;
+      color: #e8e8ed;
+      letter-spacing: 0.01em;
+      white-space: nowrap;
+      z-index: 3;
+      opacity: 0;
+      transition: opacity 0.22s var(--ease), transform 0.22s var(--ease);
+    }
+    .viz-tooltip.show {
+      opacity: 1;
+      transform: translate(-50%, calc(-100% - 14px));
+    }
+    .viz-tooltip .viz-tt-dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-right: 6px;
+      vertical-align: middle;
+    }
 
     /* ───── reveal on scroll (IntersectionObserver) ───── */
     [data-reveal] {
@@ -790,40 +842,9 @@
         </div>
 
         <div class="hero-viz" data-reveal style="--d: 2" aria-hidden="true">
-          <svg viewBox="-10 -10 220 220">
-            <!-- outbound edges to remote peers -->
-            <path class="edge" d="M100 100 L 190 30" />
-            <path class="edge" d="M100 100 L 200 100" />
-            <path class="edge" d="M100 100 L 190 180" />
-            <path class="edge" d="M100 100 L -5 40" />
-            <path class="edge" d="M100 100 L -8 160" />
-            <!-- live edges to 2 peers -->
-            <path class="edge-live" d="M100 100 L 15 95" />
-            <path class="edge-live" d="M100 100 L 185 105" />
-            <!-- my nodes (graph) -->
-            <circle class="node-mine" cx="62" cy="72" r="3" />
-            <circle class="node-mine" cx="80" cy="58" r="3" />
-            <circle class="node-mine" cx="120" cy="62" r="3" />
-            <circle class="node-mine" cx="138" cy="85" r="3" />
-            <circle class="node-mine" cx="130" cy="122" r="3" />
-            <circle class="node-mine" cx="85" cy="132" r="3" />
-            <circle class="node-mine" cx="66" cy="112" r="3" />
-            <!-- my edges -->
-            <path class="edge" d="M62 72 L 80 58 L 120 62 L 138 85 L 130 122 L 85 132 L 66 112 Z" />
-            <path class="edge" d="M80 58 L 120 62" />
-            <path class="edge" d="M138 85 L 85 132" />
-            <!-- me (accent ring) -->
-            <circle cx="100" cy="100" r="14" fill="none" stroke="var(--accent)" stroke-width="1" opacity="0.4" />
-            <circle class="node-core" cx="100" cy="100" r="6" />
-            <!-- remote peers -->
-            <circle class="node-peer" cx="190" cy="30" r="4" />
-            <circle class="node-peer" cx="200" cy="100" r="5" />
-            <circle class="node-peer" cx="190" cy="180" r="4" />
-            <circle class="node-peer" cx="-5" cy="40" r="4" />
-            <circle class="node-peer" cx="-8" cy="160" r="4" />
-            <circle class="node-peer" cx="15" cy="95" r="5" />
-            <circle class="node-peer" cx="185" cy="105" r="5" />
-          </svg>
+          <canvas class="viz-canvas" id="viz-canvas"></canvas>
+          <div class="viz-status" id="viz-status" role="status" aria-live="polite"></div>
+          <div class="viz-tooltip" id="viz-tooltip"></div>
         </div>
 
       </div>
@@ -1207,6 +1228,790 @@
         }
       }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
       document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+    })();
+  </script>
+
+  <!-- ───────────── hero three.js scene ───────────── -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.168.0/build/three.module.js"
+      }
+    }
+  </script>
+  <script type="module">
+    import * as THREE from 'three';
+
+    (() => {
+      const container = document.querySelector('.hero-viz');
+      const canvas    = document.getElementById('viz-canvas');
+      const statusEl  = document.getElementById('viz-status');
+      const tooltipEl = document.getElementById('viz-tooltip');
+      if (!container || !canvas || !statusEl || !tooltipEl) return;
+
+      const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // ───── palette ─────
+      const COL = {
+        alice:    new THREE.Color('#34d399'),
+        aliceRim: new THREE.Color('#34d399'),
+        mine:     new THREE.Color('#e8e8ed'),
+        peer:     new THREE.Color('#8c8c98'),
+        edge:     new THREE.Color('#ffffff'),
+        edgeActive: new THREE.Color('#34d399'),
+        packet:   new THREE.Color('#34d399'),
+        amber:    new THREE.Color('#d9a255'),
+      };
+
+      // ───── scenarios (cycled) ─────
+      const SCENARIOS = [
+        { q: 'ed25519 PKCS8 vs JWK in node:crypto?',  peer: '12D3KooW…abc3', conf: 0.84, age: '4d old' },
+        { q: 'libp2p gossipsub interface v3 compat?', peer: '12D3KooW…7hTn', conf: 0.72, age: '9d old' },
+        { q: 'sqlite-vec cosine vs dot distance?',    peer: '12D3KooW…M5a4', conf: 0.91, age: '2d old' },
+        { q: 'Y.js CRDT merge on partial sync?',      peer: '12D3KooW…yXfe', conf: 0.67, age: '11d old' },
+        { q: 'did:key multicodec prefix 0xed01 decode?', peer: '12D3KooW…qK9b', conf: 0.78, age: '6d old' },
+      ];
+
+      // ───── three.js bootstrap ─────
+      const renderer = new THREE.WebGLRenderer({
+        canvas,
+        alpha: true,
+        antialias: true,
+        powerPreference: 'high-performance',
+      });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setClearColor(0x000000, 0);
+
+      const scene = new THREE.Scene();
+
+      // Logical world units: [-100, 100] on each axis
+      const WORLD = 100;
+      const camera = new THREE.OrthographicCamera(-WORLD, WORLD, WORLD, -WORLD, 0.1, 1000);
+      camera.position.set(0, 0, 200);
+      camera.lookAt(0, 0, 0);
+
+      const sceneRoot = new THREE.Group();
+      scene.add(sceneRoot);
+
+      // ───── materials (shared) ─────
+      const mat = {
+        alice:    new THREE.MeshBasicMaterial({ color: COL.alice, transparent: true, opacity: 1 }),
+        aliceHalo: new THREE.MeshBasicMaterial({ color: COL.alice, transparent: true, opacity: 0.18, side: THREE.DoubleSide }),
+        aliceRing: new THREE.LineBasicMaterial({ color: COL.alice, transparent: true, opacity: 0.35 }),
+        mine:     new THREE.MeshBasicMaterial({ color: COL.mine, transparent: true, opacity: 1 }),
+        peer:     new THREE.MeshBasicMaterial({ color: COL.peer, transparent: true, opacity: 1 }),
+        peerSub:  new THREE.MeshBasicMaterial({ color: COL.peer, transparent: true, opacity: 0.75 }),
+        peerSubActive: new THREE.MeshBasicMaterial({ color: COL.alice, transparent: true, opacity: 1 }),
+        edge:     new THREE.LineBasicMaterial({ color: COL.edge, transparent: true, opacity: 0.10 }),
+        edgeFaint: new THREE.LineBasicMaterial({ color: COL.edge, transparent: true, opacity: 0.06 }),
+        edgeActive: new THREE.LineBasicMaterial({ color: COL.edgeActive, transparent: true, opacity: 0 }),
+        packet:   new THREE.MeshBasicMaterial({ color: COL.packet, transparent: true, opacity: 1 }),
+        packetGlow: new THREE.MeshBasicMaterial({ color: COL.packet, transparent: true, opacity: 0.35 }),
+      };
+
+      // ───── helpers ─────
+      const disc = (r, seg = 32) => new THREE.CircleGeometry(r, seg);
+      const ring = (inner, outer, seg = 48) => new THREE.RingGeometry(inner, outer, seg);
+
+      function makeDiscMesh(r, material) {
+        const m = new THREE.Mesh(disc(r), material);
+        return m;
+      }
+
+      function lineFromPoints(points, material) {
+        const geom = new THREE.BufferGeometry().setFromPoints(points);
+        return new THREE.Line(geom, material);
+      }
+
+      function dashedSegment(a, b, material) {
+        // Segment with dashes — we fake dashing by building multiple short segments
+        const count = 10;
+        const group = new THREE.Group();
+        for (let i = 0; i < count; i++) {
+          const t0 = i / count;
+          const t1 = t0 + (0.55 / count);
+          const p0 = new THREE.Vector3().lerpVectors(a, b, t0);
+          const p1 = new THREE.Vector3().lerpVectors(a, b, t1);
+          const g = new THREE.BufferGeometry().setFromPoints([p0, p1]);
+          const l = new THREE.Line(g, material);
+          group.add(l);
+        }
+        return group;
+      }
+
+      // ───── alice (center) ─────
+      const aliceGroup = new THREE.Group();
+      sceneRoot.add(aliceGroup);
+
+      const aliceHalo = new THREE.Mesh(disc(14, 48), mat.aliceHalo);
+      aliceGroup.add(aliceHalo);
+
+      const aliceRingGeom = ring(13.5, 14.2, 64);
+      const aliceRingMesh = new THREE.Mesh(aliceRingGeom, new THREE.MeshBasicMaterial({
+        color: COL.alice, transparent: true, opacity: 0.45, side: THREE.DoubleSide,
+      }));
+      aliceGroup.add(aliceRingMesh);
+
+      const aliceCore = new THREE.Mesh(disc(6.5, 40), mat.alice);
+      aliceGroup.add(aliceCore);
+
+      // Alice's local ring — 8 off-white nodes around her
+      const aliceRing = new THREE.Group();
+      aliceGroup.add(aliceRing);
+
+      const aliceRingRadius = 22;
+      const aliceNodes = [];
+      const aliceNodeCount = 8;
+      for (let i = 0; i < aliceNodeCount; i++) {
+        const ang = (i / aliceNodeCount) * Math.PI * 2 + 0.12;
+        const jitter = 2.8;
+        const r = aliceRingRadius + (Math.sin(i * 2.3) * jitter);
+        const x = Math.cos(ang) * r;
+        const y = Math.sin(ang) * r;
+        const m = makeDiscMesh(1.7 + (i % 3) * 0.25, mat.mine.clone());
+        m.position.set(x, y, 0.1);
+        m.userData.baseOpacity = 1;
+        aliceRing.add(m);
+        aliceNodes.push({ mesh: m, pos: new THREE.Vector3(x, y, 0), ang });
+      }
+
+      // Edges between alice's nodes (ring neighbors + two diagonals + spokes to alice)
+      const aliceEdges = [];
+      function addAliceEdge(a, b, material) {
+        const l = lineFromPoints([a.clone(), b.clone()], material);
+        aliceRing.add(l);
+        aliceEdges.push(l);
+      }
+      for (let i = 0; i < aliceNodes.length; i++) {
+        const a = aliceNodes[i].pos;
+        const b = aliceNodes[(i + 1) % aliceNodes.length].pos;
+        addAliceEdge(a, b, mat.edge);
+      }
+      // Two cross connections
+      addAliceEdge(aliceNodes[0].pos, aliceNodes[3].pos, mat.edgeFaint);
+      addAliceEdge(aliceNodes[2].pos, aliceNodes[6].pos, mat.edgeFaint);
+      // A few spokes to alice center (very faint)
+      addAliceEdge(new THREE.Vector3(0, 0, 0), aliceNodes[1].pos, mat.edgeFaint);
+      addAliceEdge(new THREE.Vector3(0, 0, 0), aliceNodes[5].pos, mat.edgeFaint);
+
+      // ───── remote peers ─────
+      // 5 peers on the outer perimeter at irregular radii/angles
+      const PEER_COUNT = 5;
+      const PEER_SEEDS = [
+        { ang: -0.35,              r: 78, sz: 4.6 },
+        { ang: 0.78,               r: 86, sz: 5.2 },
+        { ang: Math.PI - 0.55,     r: 80, sz: 3.9 },
+        { ang: Math.PI + 0.30,     r: 84, sz: 4.8 },
+        { ang: -Math.PI / 2 - 0.2, r: 72, sz: 4.1 },
+      ];
+
+      const peers = PEER_SEEDS.map((seed, idx) => {
+        const pg = new THREE.Group();
+        sceneRoot.add(pg);
+
+        const px = Math.cos(seed.ang) * seed.r;
+        const py = Math.sin(seed.ang) * seed.r;
+        pg.position.set(px, py, 0);
+
+        // Idle spoke from alice → peer (very faint)
+        const spokeGeom = new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(0, 0, 0),
+          new THREE.Vector3(px, py, 0),
+        ]);
+        const spoke = new THREE.Line(spokeGeom, new THREE.LineBasicMaterial({
+          color: COL.edge, transparent: true, opacity: 0.07,
+        }));
+        sceneRoot.add(spoke);
+
+        // Peer sphere (disc)
+        const peerMesh = new THREE.Mesh(disc(seed.sz, 36), mat.peer.clone());
+        peerMesh.position.set(0, 0, 0.2);
+        peerMesh.userData.kind = 'peer';
+        peerMesh.userData.peerIdx = idx;
+        pg.add(peerMesh);
+
+        // Peer sub-graph — 4-5 dots clustered around peer
+        const subCount = 4 + (idx % 2);
+        const subNodes = [];
+        const subEdges = [];
+        const clusterSide = Math.sign(px) || 1; // cluster "behind" peer
+        for (let j = 0; j < subCount; j++) {
+          const t = j / subCount;
+          const subAng = seed.ang + (t - 0.5) * 1.1 + 0.45 * clusterSide;
+          const subR = 9 + ((j * 1.7) % 5);
+          const sx = Math.cos(subAng) * subR + clusterSide * 3.5;
+          const sy = Math.sin(subAng) * subR;
+          const sMat = mat.peerSub.clone();
+          const s = makeDiscMesh(1.25 + (j % 2) * 0.25, sMat);
+          s.position.set(sx, sy, 0.15);
+          s.userData.baseOpacity = 0.75;
+          pg.add(s);
+          subNodes.push({ mesh: s, pos: new THREE.Vector3(sx, sy, 0.15), material: sMat });
+        }
+
+        // Connect sub-nodes sequentially + one to the peer center
+        for (let j = 0; j < subNodes.length - 1; j++) {
+          const a = subNodes[j].pos;
+          const b = subNodes[j + 1].pos;
+          const eMat = new THREE.LineBasicMaterial({ color: COL.edge, transparent: true, opacity: 0.09 });
+          const eMatActive = new THREE.LineBasicMaterial({ color: COL.edgeActive, transparent: true, opacity: 0 });
+          const e = lineFromPoints([a.clone(), b.clone()], eMat);
+          const eActive = lineFromPoints([a.clone(), b.clone()], eMatActive);
+          pg.add(e);
+          pg.add(eActive);
+          subEdges.push({ idle: eMat, active: eMatActive, line: e, lineActive: eActive });
+        }
+        // one edge peer-center → first sub node
+        {
+          const a = new THREE.Vector3(0, 0, 0);
+          const b = subNodes[0].pos;
+          const eMat = new THREE.LineBasicMaterial({ color: COL.edge, transparent: true, opacity: 0.09 });
+          const e = lineFromPoints([a.clone(), b.clone()], eMat);
+          pg.add(e);
+        }
+
+        return {
+          group: pg,
+          mesh: peerMesh,
+          baseScale: 1,
+          pos: new THREE.Vector3(px, py, 0),
+          spoke,
+          subNodes,
+          subEdges,
+          seed,
+        };
+      });
+
+      // ───── question/answer beam layer ─────
+      const beamLayer = new THREE.Group();
+      sceneRoot.add(beamLayer);
+
+      let activeBeam = null; // { dashGroup, packet, packetGlow, material, startTime, phase }
+
+      function clearBeam() {
+        while (beamLayer.children.length) {
+          const c = beamLayer.children.pop();
+          c.traverse?.((o) => {
+            if (o.geometry) o.geometry.dispose();
+            if (o.material) {
+              if (Array.isArray(o.material)) o.material.forEach(m => m.dispose());
+              else o.material.dispose();
+            }
+          });
+        }
+        activeBeam = null;
+      }
+
+      function buildBeam(from, to) {
+        const group = new THREE.Group();
+
+        // dashed line (10 short segments)
+        const dashMat = new THREE.LineBasicMaterial({
+          color: COL.edgeActive, transparent: true, opacity: 0,
+        });
+        const segCount = 14;
+        const dashSegs = [];
+        for (let i = 0; i < segCount; i++) {
+          const t0 = i / segCount;
+          const t1 = t0 + (0.55 / segCount);
+          const a = new THREE.Vector3().lerpVectors(from, to, t0);
+          const b = new THREE.Vector3().lerpVectors(from, to, t1);
+          const g = new THREE.BufferGeometry().setFromPoints([a, b]);
+          const l = new THREE.Line(g, dashMat);
+          group.add(l);
+          dashSegs.push(l);
+        }
+
+        // packet glow + core
+        const glow = new THREE.Mesh(disc(3.2, 24), new THREE.MeshBasicMaterial({
+          color: COL.packet, transparent: true, opacity: 0,
+        }));
+        const core = new THREE.Mesh(disc(1.4, 24), new THREE.MeshBasicMaterial({
+          color: COL.packet, transparent: true, opacity: 0,
+        }));
+        group.add(glow);
+        group.add(core);
+
+        beamLayer.add(group);
+        return { group, dashMat, glow, core, from: from.clone(), to: to.clone() };
+      }
+
+      // ───── alice's "absorb" spare slots ─────
+      // Keep track of ghost slots we fade in as new nodes during phase E
+      const absorbSlots = [];
+      for (let i = 0; i < 3; i++) {
+        const ang = (i / 3) * Math.PI * 2 + 1.7;
+        const r = aliceRingRadius + 3.6;
+        const x = Math.cos(ang) * r;
+        const y = Math.sin(ang) * r;
+        const m = makeDiscMesh(1.55, new THREE.MeshBasicMaterial({
+          color: COL.mine, transparent: true, opacity: 0,
+        }));
+        m.position.set(x, y, 0.1);
+        aliceRing.add(m);
+
+        // edge from absorb slot to nearest alice node
+        let nearest = aliceNodes[0];
+        let nd = Infinity;
+        for (const n of aliceNodes) {
+          const dd = n.pos.distanceTo(new THREE.Vector3(x, y, 0));
+          if (dd < nd) { nd = dd; nearest = n; }
+        }
+        const eMat = new THREE.LineBasicMaterial({
+          color: COL.edge, transparent: true, opacity: 0,
+        });
+        const eLine = lineFromPoints([nearest.pos.clone(), new THREE.Vector3(x, y, 0)], eMat);
+        aliceRing.add(eLine);
+
+        absorbSlots.push({ mesh: m, material: m.material, edgeMat: eMat });
+      }
+
+      // ───── animation state machine ─────
+      const PHASES = [
+        { name: 'A_typing',   dur: 1.5 },
+        { name: 'B_question', dur: 1.5 },
+        { name: 'C_research', dur: 3.0 },
+        { name: 'D_answer',   dur: 1.5 },
+        { name: 'E_absorb',   dur: 1.5 },
+        { name: 'F_settle',   dur: 1.0 },
+      ];
+      const TOTAL_DUR = PHASES.reduce((s, p) => s + p.dur, 0);
+
+      let scenarioIdx = 0;
+      let forcedPeerIdx = null; // set by click
+      let cycleStart = performance.now();
+      let currentPeer = null;
+      let currentScenario = null;
+      let absorbPicked = [];
+
+      function setStatus({ phase, scenario, peerIdx }) {
+        if (!scenario) {
+          statusEl.classList.remove('show');
+          return;
+        }
+        const peerLabel = SCENARIOS[scenarioIdx].peer;
+        if (phase === 'A_typing' || phase === 'B_question' || phase === 'C_research') {
+          statusEl.innerHTML =
+            '<span class="viz-st-label">asking:</span>' +
+            '<span class="viz-st-q">"' + scenario.q + '"</span>';
+          statusEl.classList.add('show');
+        } else if (phase === 'D_answer' || phase === 'E_absorb') {
+          statusEl.innerHTML =
+            '<span class="viz-st-label">answered by:</span>' +
+            '<span class="viz-st-peer">' + scenario.peer + '</span>' +
+            '<span class="viz-st-label" style="margin-left:.7em">conf</span>' +
+            '<span class="viz-st-conf">' + scenario.conf.toFixed(2) + '</span>' +
+            '<span class="viz-st-label" style="margin-left:.6em">·</span>' +
+            '<span class="viz-st-label">' + scenario.age + '</span>';
+          statusEl.classList.add('show');
+        } else if (phase === 'F_settle') {
+          // keep text, fade out handled via CSS (opacity) — here we just drop it after a bit
+          statusEl.classList.remove('show');
+        }
+      }
+
+      function startCycle() {
+        clearBeam();
+        scenarioIdx = (scenarioIdx + 1) % SCENARIOS.length;
+        currentScenario = SCENARIOS[scenarioIdx];
+
+        // Peer for this cycle
+        let peerIdx;
+        if (forcedPeerIdx != null) {
+          peerIdx = forcedPeerIdx;
+          forcedPeerIdx = null;
+        } else {
+          peerIdx = scenarioIdx % peers.length;
+        }
+        currentPeer = peers[peerIdx];
+
+        // Pick 1-2 absorb slots to fill this cycle (rotate through)
+        const slotCount = 1 + (scenarioIdx % 2);
+        absorbPicked = [];
+        for (let i = 0; i < slotCount; i++) {
+          absorbPicked.push(absorbSlots[(scenarioIdx + i) % absorbSlots.length]);
+        }
+        // reset absorb slots on cycle start (they fade in then persist until next cycle)
+        absorbSlots.forEach(s => {
+          s.material.opacity = 0;
+          s.edgeMat.opacity = 0;
+        });
+
+        cycleStart = performance.now();
+      }
+
+      function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+      function easeInOutCubic(t) {
+        return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+      }
+      function easeOutExpo(t) { return t === 1 ? 1 : 1 - Math.pow(2, -10 * t); }
+
+      function phaseAt(elapsed) {
+        let acc = 0;
+        for (const p of PHASES) {
+          if (elapsed < acc + p.dur) {
+            return { name: p.name, local: (elapsed - acc) / p.dur, accStart: acc, dur: p.dur };
+          }
+          acc += p.dur;
+        }
+        return null;
+      }
+
+      let clickRingMesh = null;
+      let clickRingStart = 0;
+      function spawnClickRing(peer) {
+        if (clickRingMesh) {
+          sceneRoot.remove(clickRingMesh);
+          clickRingMesh.geometry.dispose();
+          clickRingMesh.material.dispose();
+        }
+        const geom = ring(peer.seed.sz + 1.5, peer.seed.sz + 2.2, 48);
+        const m = new THREE.Mesh(geom, new THREE.MeshBasicMaterial({
+          color: COL.alice, transparent: true, opacity: 0.9, side: THREE.DoubleSide,
+        }));
+        m.position.copy(peer.pos);
+        sceneRoot.add(m);
+        clickRingMesh = m;
+        clickRingStart = performance.now();
+      }
+
+      function updateClickRing(now) {
+        if (!clickRingMesh) return;
+        const t = (now - clickRingStart) / 700;
+        if (t >= 1) {
+          sceneRoot.remove(clickRingMesh);
+          clickRingMesh.geometry.dispose();
+          clickRingMesh.material.dispose();
+          clickRingMesh = null;
+          return;
+        }
+        const s = 1 + easeOutCubic(t) * 0.9;
+        clickRingMesh.scale.setScalar(s);
+        clickRingMesh.material.opacity = 0.9 * (1 - t);
+      }
+
+      // ───── per-frame scene update ─────
+      function updatePhases(now) {
+        const elapsed = (now - cycleStart) / 1000;
+        if (elapsed >= TOTAL_DUR) {
+          startCycle();
+          return;
+        }
+        const ph = phaseAt(elapsed);
+        if (!ph) return;
+
+        // Alice pulse (phase A soft pulse)
+        let aliceScale = 1;
+        let haloOpacity = 0.18;
+        if (ph.name === 'A_typing') {
+          aliceScale = 1 + 0.05 * Math.sin(ph.local * Math.PI * 3);
+          haloOpacity = 0.18 + 0.14 * (0.5 + 0.5 * Math.sin(ph.local * Math.PI * 3));
+          setStatus({ phase: ph.name, scenario: currentScenario });
+        }
+        aliceCore.scale.setScalar(aliceScale);
+        aliceHalo.material.opacity = haloOpacity;
+
+        // Phase B — question beam goes out
+        if (ph.name === 'B_question') {
+          if (!activeBeam) {
+            activeBeam = buildBeam(new THREE.Vector3(0, 0, 0.3), currentPeer.pos.clone().setZ(0.3));
+            activeBeam.direction = 'outbound';
+          }
+          const t = easeOutCubic(ph.local);
+          activeBeam.dashMat.opacity = 0.55 * Math.min(1, ph.local * 2);
+          // packet travels from 0 → to
+          const p = new THREE.Vector3().lerpVectors(activeBeam.from, activeBeam.to, t);
+          activeBeam.core.position.copy(p);
+          activeBeam.glow.position.copy(p);
+          activeBeam.core.material.opacity = 1;
+          activeBeam.glow.material.opacity = 0.55;
+          setStatus({ phase: ph.name, scenario: currentScenario });
+        }
+
+        // Phase C — peer researches: enlarge + sub-graph lights in sequence
+        if (ph.name === 'C_research') {
+          // fade question beam out
+          if (activeBeam) {
+            const fadeT = Math.min(1, ph.local * 4);
+            activeBeam.dashMat.opacity = 0.55 * (1 - fadeT);
+            activeBeam.core.material.opacity = (1 - fadeT);
+            activeBeam.glow.material.opacity = 0.55 * (1 - fadeT);
+            if (fadeT >= 1) clearBeam();
+          }
+          // enlarge peer
+          const pulse = 1 + 0.22 * Math.sin(ph.local * Math.PI);
+          currentPeer.mesh.scale.setScalar(pulse);
+          // light up peer itself toward alice accent
+          const peerBlend = 0.5 + 0.5 * Math.sin(ph.local * Math.PI);
+          currentPeer.mesh.material.color.lerpColors(COL.peer, COL.alice, peerBlend * 0.55);
+
+          // sequential sub-graph nodes
+          const subs = currentPeer.subNodes;
+          const stagger = 0.3; // seconds between nodes
+          const subDur = 0.6;  // lit duration
+          for (let i = 0; i < subs.length; i++) {
+            const tStart = i * stagger;
+            const tEnd = tStart + subDur;
+            const tNow = ph.local * ph.dur;
+            if (tNow >= tStart && tNow <= tEnd + 0.3) {
+              const local = Math.min(1, (tNow - tStart) / subDur);
+              const bright = Math.sin(local * Math.PI); // rise and fall
+              subs[i].material.color.lerpColors(COL.peer, COL.alice, bright);
+              subs[i].material.opacity = 0.75 + 0.25 * bright;
+              subs[i].mesh.scale.setScalar(1 + 0.35 * bright);
+
+              // light edge into this node if exists
+              const edge = currentPeer.subEdges[i - 1] || currentPeer.subEdges[i];
+              if (edge) {
+                edge.active.opacity = 0.75 * bright;
+              }
+            } else {
+              subs[i].material.color.copy(COL.peer);
+              subs[i].material.opacity = 0.75;
+              subs[i].mesh.scale.setScalar(1);
+            }
+          }
+        } else {
+          // reset peer states when outside phase C
+          peers.forEach(p => {
+            p.mesh.scale.setScalar(1);
+            p.mesh.material.color.copy(COL.peer);
+            p.subNodes.forEach(s => {
+              s.material.color.copy(COL.peer);
+              s.material.opacity = 0.75;
+              s.mesh.scale.setScalar(1);
+            });
+            p.subEdges.forEach(e => { e.active.opacity = 0; });
+          });
+        }
+
+        // Phase D — answer beam from peer → alice (stronger)
+        if (ph.name === 'D_answer') {
+          if (!activeBeam || activeBeam.direction !== 'inbound') {
+            clearBeam();
+            activeBeam = buildBeam(currentPeer.pos.clone().setZ(0.3), new THREE.Vector3(0, 0, 0.3));
+            activeBeam.direction = 'inbound';
+            // bigger packet
+            activeBeam.core.geometry.dispose();
+            activeBeam.core.geometry = disc(1.9, 24);
+            activeBeam.glow.geometry.dispose();
+            activeBeam.glow.geometry = disc(4.4, 24);
+          }
+          const t = easeOutExpo(ph.local);
+          activeBeam.dashMat.opacity = 0.75 * Math.min(1, ph.local * 2);
+          const p = new THREE.Vector3().lerpVectors(activeBeam.from, activeBeam.to, t);
+          activeBeam.core.position.copy(p);
+          activeBeam.glow.position.copy(p);
+          activeBeam.core.material.opacity = 1;
+          activeBeam.glow.material.opacity = 0.7;
+          setStatus({ phase: ph.name, scenario: currentScenario });
+        }
+
+        // Phase E — alice absorbs new nodes
+        if (ph.name === 'E_absorb') {
+          if (activeBeam) {
+            const fadeT = Math.min(1, ph.local * 3);
+            activeBeam.dashMat.opacity = 0.75 * (1 - fadeT);
+            activeBeam.core.material.opacity = (1 - fadeT);
+            activeBeam.glow.material.opacity = 0.7 * (1 - fadeT);
+            if (fadeT >= 1) clearBeam();
+          }
+          // alice pulse on absorb
+          const pulse = 1 + 0.14 * Math.sin(ph.local * Math.PI);
+          aliceCore.scale.setScalar(pulse);
+          aliceHalo.material.opacity = 0.18 + 0.22 * Math.sin(ph.local * Math.PI);
+
+          // fade-in absorb slots
+          absorbPicked.forEach((slot, i) => {
+            const delay = i * 0.18;
+            const local = Math.max(0, Math.min(1, (ph.local * ph.dur - delay) / 0.8));
+            const k = easeOutCubic(local);
+            slot.material.opacity = k;
+            slot.edgeMat.opacity = 0.18 * k;
+          });
+          setStatus({ phase: ph.name, scenario: currentScenario });
+        }
+
+        // Phase F — settle (fade status)
+        if (ph.name === 'F_settle') {
+          const k = 1 - ph.local;
+          statusEl.style.opacity = String(0.85 * k);
+          // keep absorb slots visible but leave class
+          if (ph.local > 0.8) {
+            // at very end prepare for next cycle
+          }
+        } else {
+          statusEl.style.opacity = '';
+        }
+      }
+
+      // ───── pointer parallax (spring damped) ─────
+      const pointer = { tx: 0, ty: 0, x: 0, y: 0, vx: 0, vy: 0 };
+      const hasPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+      function onPointerMove(ev) {
+        const rect = canvas.getBoundingClientRect();
+        const nx = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
+        const ny = ((ev.clientY - rect.top) / rect.height) * 2 - 1;
+        pointer.tx = nx;
+        pointer.ty = ny;
+        updateHover(ev.clientX, ev.clientY, rect);
+      }
+
+      function onPointerLeave() {
+        pointer.tx = 0;
+        pointer.ty = 0;
+        tooltipEl.classList.remove('show');
+        hoveredPeer = null;
+      }
+
+      // ───── raycaster / hover ─────
+      const raycaster = new THREE.Raycaster();
+      const pointerNDC = new THREE.Vector2();
+      let hoveredPeer = null;
+
+      function updateHover(clientX, clientY, rect) {
+        if (!rect) rect = canvas.getBoundingClientRect();
+        pointerNDC.x = ((clientX - rect.left) / rect.width) * 2 - 1;
+        pointerNDC.y = -(((clientY - rect.top) / rect.height) * 2 - 1);
+        raycaster.setFromCamera(pointerNDC, camera);
+        const targets = peers.map(p => p.mesh);
+        const hits = raycaster.intersectObjects(targets, false);
+        if (hits.length) {
+          const peerIdx = hits[0].object.userData.peerIdx;
+          hoveredPeer = peers[peerIdx];
+          // project peer position to screen
+          const worldPos = hoveredPeer.pos.clone();
+          const projected = worldPos.project(camera);
+          const sx = (projected.x * 0.5 + 0.5) * rect.width;
+          const sy = (-projected.y * 0.5 + 0.5) * rect.height;
+          tooltipEl.innerHTML = '<span class="viz-tt-dot"></span>peer ' + SCENARIOS[(scenarioIdx + peerIdx) % SCENARIOS.length].peer;
+          tooltipEl.style.left = sx + 'px';
+          tooltipEl.style.top = sy + 'px';
+          tooltipEl.classList.add('show');
+          canvas.style.cursor = 'pointer';
+        } else {
+          hoveredPeer = null;
+          tooltipEl.classList.remove('show');
+          canvas.style.cursor = '';
+        }
+      }
+
+      // ───── click: force next cycle to this peer ─────
+      function onClick(ev) {
+        const rect = canvas.getBoundingClientRect();
+        pointerNDC.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
+        pointerNDC.y = -(((ev.clientY - rect.top) / rect.height) * 2 - 1);
+        raycaster.setFromCamera(pointerNDC, camera);
+        const hits = raycaster.intersectObjects(peers.map(p => p.mesh), false);
+        if (hits.length) {
+          const peerIdx = hits[0].object.userData.peerIdx;
+          forcedPeerIdx = peerIdx;
+          spawnClickRing(peers[peerIdx]);
+        }
+      }
+
+      // ───── resize (ResizeObserver on container) ─────
+      let cssW = 1, cssH = 1;
+      function applySize() {
+        const rect = container.getBoundingClientRect();
+        cssW = Math.max(1, rect.width);
+        cssH = Math.max(1, rect.height);
+        renderer.setSize(cssW, cssH, false);
+        // Keep orthographic frustum square in world units; match aspect via camera
+        const aspect = cssW / cssH;
+        if (aspect >= 1) {
+          camera.left = -WORLD * aspect;
+          camera.right = WORLD * aspect;
+          camera.top = WORLD;
+          camera.bottom = -WORLD;
+        } else {
+          camera.left = -WORLD;
+          camera.right = WORLD;
+          camera.top = WORLD / aspect;
+          camera.bottom = -WORLD / aspect;
+        }
+        camera.updateProjectionMatrix();
+      }
+
+      const ro = new ResizeObserver(() => applySize());
+      ro.observe(container);
+      applySize();
+
+      // ───── main loop ─────
+      const scenePivot = new THREE.Group();
+      scene.remove(sceneRoot);
+      scenePivot.add(sceneRoot);
+      scene.add(scenePivot);
+
+      let rafId = 0;
+      let running = true;
+      let lastNow = performance.now();
+
+      function tick(now) {
+        rafId = requestAnimationFrame(tick);
+        if (!running) return;
+
+        // Parallax spring
+        if (hasPointer && !REDUCED && cssW >= 520) {
+          // spring towards target
+          const stiffness = 0.06;
+          const damping = 0.78;
+          pointer.vx += (pointer.tx - pointer.x) * stiffness;
+          pointer.vy += (pointer.ty - pointer.y) * stiffness;
+          pointer.vx *= damping;
+          pointer.vy *= damping;
+          pointer.x += pointer.vx;
+          pointer.y += pointer.vy;
+          const MAX = THREE.MathUtils.degToRad(3);
+          scenePivot.rotation.y = pointer.x * MAX;
+          scenePivot.rotation.x = -pointer.y * MAX;
+        } else {
+          scenePivot.rotation.x = 0;
+          scenePivot.rotation.y = 0;
+        }
+
+        // Alice ring slow rotation (soft motion even idle)
+        if (!REDUCED) {
+          aliceRing.rotation.z = Math.sin(now / 9000) * 0.04;
+        }
+
+        if (!REDUCED) {
+          updatePhases(now);
+          updateClickRing(now);
+        }
+
+        renderer.render(scene, camera);
+        lastNow = now;
+      }
+
+      // ───── visibility gate (IntersectionObserver) ─────
+      const vio = new IntersectionObserver((entries) => {
+        for (const e of entries) {
+          running = e.isIntersecting;
+        }
+      }, { threshold: 0.05 });
+      vio.observe(container);
+
+      // ───── attach listeners ─────
+      if (!REDUCED && hasPointer) {
+        canvas.addEventListener('pointermove', onPointerMove, { passive: true });
+        canvas.addEventListener('pointerleave', onPointerLeave, { passive: true });
+        canvas.addEventListener('click', onClick);
+      }
+
+      // ───── reduced motion: static pose ─────
+      if (REDUCED) {
+        // render one frame of still state
+        statusEl.innerHTML =
+          '<span class="viz-st-label">peers:</span>' +
+          '<span class="viz-st-peer">5 reachable</span>';
+        statusEl.classList.add('show');
+        renderer.render(scene, camera);
+      } else {
+        startCycle();
+        rafId = requestAnimationFrame(tick);
+      }
     })();
   </script>
 </body>
