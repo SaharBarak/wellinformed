@@ -1263,14 +1263,28 @@
         amber:    new THREE.Color('#d9a255'),
       };
 
-      // ───── scenarios (cycled) ─────
-      const SCENARIOS = [
-        { q: 'ed25519 PKCS8 vs JWK in node:crypto?',  peer: '12D3KooW…abc3', conf: 0.84, age: '4d old' },
-        { q: 'libp2p gossipsub interface v3 compat?', peer: '12D3KooW…7hTn', conf: 0.72, age: '9d old' },
-        { q: 'sqlite-vec cosine vs dot distance?',    peer: '12D3KooW…M5a4', conf: 0.91, age: '2d old' },
-        { q: 'Y.js CRDT merge on partial sync?',      peer: '12D3KooW…yXfe', conf: 0.67, age: '11d old' },
+      // ───── scenarios — two directions ─────
+      // ALICE_SCENARIOS: Alice asks, a peer has the research and replies.
+      const ALICE_SCENARIOS = [
+        { q: 'ed25519 PKCS8 vs JWK in node:crypto?',   peer: '12D3KooW…abc3', conf: 0.84, age: '4d old' },
+        { q: 'libp2p gossipsub interface v3 compat?',  peer: '12D3KooW…7hTn', conf: 0.72, age: '9d old' },
+        { q: 'sqlite-vec cosine vs dot distance?',     peer: '12D3KooW…M5a4', conf: 0.91, age: '2d old' },
+        { q: 'Y.js CRDT merge on partial sync?',       peer: '12D3KooW…yXfe', conf: 0.67, age: '11d old' },
         { q: 'did:key multicodec prefix 0xed01 decode?', peer: '12D3KooW…qK9b', conf: 0.78, age: '6d old' },
       ];
+      // PEER_SCENARIOS: a peer broadcasts a question to the network and
+      // Alice's graph has the answer. Inverts the asker/responder roles —
+      // same pubsub topic, same oracle_answerable heuristic on Alice's side.
+      const PEER_SCENARIOS = [
+        { q: 'touch protocol rate-limit on oversize rooms?', asker: '12D3KooW…abc3', conf: 0.88, age: '1d old' },
+        { q: 'secret-gate patterns — does it catch slack webhooks?', asker: '12D3KooW…7hTn', conf: 0.74, age: '5d old' },
+        { q: 'hybrid RRF k=60 vs k=40 on SciFact NDCG?', asker: '12D3KooW…M5a4', conf: 0.82, age: '3d old' },
+        { q: 'oracle_answerable threshold defaults?',   asker: '12D3KooW…yXfe', conf: 0.69, age: '8d old' },
+        { q: 'remote-node-validator on opaque internal schemes?', asker: '12D3KooW…qK9b', conf: 0.93, age: '2d old' },
+      ];
+      // Legacy alias so any code that still reads SCENARIOS by index (e.g.
+      // the tooltip fallback) doesn't break. Points at the Alice pool.
+      const SCENARIOS = ALICE_SCENARIOS;
 
       // ───── three.js bootstrap ─────
       const renderer = new THREE.WebGLRenderer({
@@ -1641,11 +1655,14 @@
       const TOTAL_DUR = PHASES.reduce((s, p) => s + p.dur, 0);
 
       let scenarioIdx = 0;
-      let forcedPeerIdx = null; // set by click
+      let forcedPeerIdx = null;   // set by click — forces next RESPONDER to this peer (Alice-asking cycles only)
       let cycleStart = performance.now();
-      let currentPeer = null;
+      let currentPeer = null;      // responder peer (Alice-asks mode) OR asker peer (peer-asks mode)
       let currentScenario = null;
       let absorbPicked = [];
+      let cycleCount = 0;          // increments every cycle; parity selects mode
+      let cycleMode = 'alice-asks'; // 'alice-asks' | 'peer-asks'
+      let askerPeer = null;         // set only when cycleMode === 'peer-asks'
 
       function setStatus({ phase, scenario, peerIdx }) {
         if (!scenario) {
@@ -1653,15 +1670,24 @@
           return;
         }
         const peerCount = peers.length;
+        // Non-asker node count: peers-1 + alice(1) when peer asks, peers when alice asks
+        const reach = (cycleMode === 'peer-asks') ? peerCount : peerCount;
+        const askerLabel = (cycleMode === 'peer-asks' && askerPeer)
+          ? (currentScenario.asker || '12D3KooW…peer')
+          : 'you';
+        const responderLabel = (cycleMode === 'peer-asks')
+          ? 'you (your graph)'
+          : (scenario.peer || '12D3KooW…peer');
+
         if (phase === 'A_typing') {
           statusEl.innerHTML =
-            '<span class="viz-st-label">asking:</span>' +
+            '<span class="viz-st-label">' + askerLabel + ' asking:</span>' +
             '<span class="viz-st-q">"' + scenario.q + '"</span>';
           statusEl.classList.add('show');
         } else if (phase === 'B_question') {
           statusEl.innerHTML =
             '<span class="viz-st-label">broadcasting to</span>' +
-            '<span class="viz-st-conf">' + peerCount + '</span>' +
+            '<span class="viz-st-conf">' + reach + '</span>' +
             '<span class="viz-st-label">peer(s) over</span>' +
             '<span class="viz-st-peer">/wellinformed/oracle/1.0.0</span>';
           statusEl.classList.add('show');
@@ -1670,13 +1696,13 @@
             '<span class="viz-st-label">network: </span>' +
             '<span class="viz-st-conf">1</span>' +
             '<span class="viz-st-label">match ·</span>' +
-            '<span class="viz-st-label">' + (peerCount - 1) + '</span>' +
+            '<span class="viz-st-label">' + (reach - 1) + '</span>' +
             '<span class="viz-st-label">passed</span>';
           statusEl.classList.add('show');
         } else if (phase === 'D_answer' || phase === 'E_absorb') {
           statusEl.innerHTML =
             '<span class="viz-st-label">answered by:</span>' +
-            '<span class="viz-st-peer">' + scenario.peer + '</span>' +
+            '<span class="viz-st-peer">' + responderLabel + '</span>' +
             '<span class="viz-st-label" style="margin-left:.7em">conf</span>' +
             '<span class="viz-st-conf">' + scenario.conf.toFixed(2) + '</span>' +
             '<span class="viz-st-label" style="margin-left:.6em">·</span>' +
@@ -1689,31 +1715,56 @@
 
       function startCycle() {
         clearBeam();
-        scenarioIdx = (scenarioIdx + 1) % SCENARIOS.length;
-        currentScenario = SCENARIOS[scenarioIdx];
 
-        // Peer for this cycle
-        let peerIdx;
-        if (forcedPeerIdx != null) {
-          peerIdx = forcedPeerIdx;
-          forcedPeerIdx = null;
+        // Alternate modes every cycle: Alice asks → peer asks → Alice asks …
+        // Even cycleCount = Alice asks, odd = a peer asks.
+        cycleMode = (cycleCount % 2 === 0) ? 'alice-asks' : 'peer-asks';
+
+        if (cycleMode === 'alice-asks') {
+          scenarioIdx = (scenarioIdx + 1) % ALICE_SCENARIOS.length;
+          currentScenario = ALICE_SCENARIOS[scenarioIdx];
+
+          // Responder peer for this cycle (who has the research)
+          let peerIdx;
+          if (forcedPeerIdx != null) {
+            peerIdx = forcedPeerIdx;
+            forcedPeerIdx = null;
+          } else {
+            peerIdx = scenarioIdx % peers.length;
+          }
+          currentPeer = peers[peerIdx];
+          askerPeer = null;
+
+          // Pick 1-2 absorb slots to fill this cycle (Alice grows her graph)
+          const slotCount = 1 + (scenarioIdx % 2);
+          absorbPicked = [];
+          for (let i = 0; i < slotCount; i++) {
+            absorbPicked.push(absorbSlots[(scenarioIdx + i) % absorbSlots.length]);
+          }
+          absorbSlots.forEach(s => {
+            s.material.opacity = 0;
+            s.edgeMat.opacity = 0;
+          });
         } else {
-          peerIdx = scenarioIdx % peers.length;
+          // peer-asks: pick a peer to be the asker. Rotate through peers so
+          // every peer gets to ask over time. Alice is always the responder
+          // in this mode (her graph has the answer).
+          const peerScenarioIdx = Math.floor(cycleCount / 2) % PEER_SCENARIOS.length;
+          currentScenario = PEER_SCENARIOS[peerScenarioIdx];
+          const askerIdx = Math.floor(cycleCount / 2) % peers.length;
+          askerPeer = peers[askerIdx];
+          currentPeer = askerPeer;  // shared reference for click highlighting / tooltip
+          // No absorb slots fire in peer-asks mode — the absorb slots are
+          // Alice-owned. Keep them invisible so the previous cycle's slots
+          // don't linger.
+          absorbPicked = [];
+          absorbSlots.forEach(s => {
+            s.material.opacity = 0;
+            s.edgeMat.opacity = 0;
+          });
         }
-        currentPeer = peers[peerIdx];
 
-        // Pick 1-2 absorb slots to fill this cycle (rotate through)
-        const slotCount = 1 + (scenarioIdx % 2);
-        absorbPicked = [];
-        for (let i = 0; i < slotCount; i++) {
-          absorbPicked.push(absorbSlots[(scenarioIdx + i) % absorbSlots.length]);
-        }
-        // reset absorb slots on cycle start (they fade in then persist until next cycle)
-        absorbSlots.forEach(s => {
-          s.material.opacity = 0;
-          s.edgeMat.opacity = 0;
-        });
-
+        cycleCount++;
         cycleStart = performance.now();
       }
 
@@ -1788,17 +1839,33 @@
         aliceCore.scale.setScalar(aliceScale);
         aliceHalo.material.opacity = haloOpacity;
 
-        // Phase B — BROADCAST: one beam to every peer simultaneously
-        // (matches the real oracle_ask --live + gossipsub semantics — question
-        // fans out to the whole topic, every subscriber receives it). Peer-to-
-        // peer mesh edges also pulse to show gossipsub flood across direct
-        // libp2p connections.
+        // Asker/responder positions — depends on cycleMode.
+        const askerPos = (cycleMode === 'peer-asks' && askerPeer)
+          ? askerPeer.pos.clone().setZ(0.3)
+          : new THREE.Vector3(0, 0, 0.3);
+        const responderPos = (cycleMode === 'peer-asks')
+          ? new THREE.Vector3(0, 0, 0.3)        // alice answers
+          : currentPeer.pos.clone().setZ(0.3); // a peer answers
+
+        // Phase B — BROADCAST: beams from asker to every other node on
+        // the network (peers it isn't and Alice if the asker is a peer).
+        // Matches oracle_ask --live + gossipsub: one publish, every
+        // subscriber receives.
         if (ph.name === 'B_question') {
           if (activeBeams.length === 0) {
+            // Targets = every peer except the asker, plus Alice if asker is a peer.
+            const targets = [];
             for (const peer of peers) {
-              const b = buildBeam(new THREE.Vector3(0, 0, 0.3), peer.pos.clone().setZ(0.3));
+              if (peer === askerPeer) continue;
+              targets.push({ pos: peer.pos.clone().setZ(0.3), peer });
+            }
+            if (cycleMode === 'peer-asks') {
+              targets.push({ pos: new THREE.Vector3(0, 0, 0.3), peer: null /* alice */ });
+            }
+            for (const t of targets) {
+              const b = buildBeam(askerPos.clone(), t.pos);
               b.direction = 'outbound';
-              b.peer = peer;
+              b.peer = t.peer;
               activeBeams.push(b);
             }
           }
@@ -1859,57 +1926,79 @@
             }
           }
 
-          // Every peer's "evaluation" pulse — a quick brighten-then-dim in
-          // the first 0.5 s of phase C. Gives the network-scan feel without
-          // claiming each peer has the answer.
+          // Every non-asker, non-responder peer does a brief "evaluation"
+          // pulse in the first 0.5 s of phase C.
           const evalT = Math.min(1, ph.local * 2);      // 0 → 1 over first 50% of phase
           const evalPulse = Math.sin(evalT * Math.PI);  // rise-fall
           for (const peer of peers) {
-            if (peer === currentPeer) continue;
-            // non-matching peers: brief white-ish glow, then sink back to gray
-            const dim = 1 - evalT;                      // fade out after evaluation
+            // skip asker (it's the source) and responder (full research mode below)
+            if (peer === askerPeer) continue;
+            if (cycleMode === 'alice-asks' && peer === currentPeer) continue;
             peer.mesh.material.color.lerpColors(COL.peer, COL.mine, evalPulse * 0.45);
             peer.mesh.material.opacity = 1;
             peer.mesh.scale.setScalar(1 + 0.08 * evalPulse);
-            // faint ghost of their sub-graph (evaluating their own index)
             peer.subNodes.forEach(s => {
-              s.material.opacity = 0.75 - 0.35 * dim * 0;  // keep idle
               s.material.color.lerpColors(COL.peer, COL.mine, evalPulse * 0.3);
               s.mesh.scale.setScalar(1 + 0.1 * evalPulse);
             });
           }
 
-          // The matching peer — full research mode starts AFTER the eval pulse
-          // so the timing reads as "all peers look, one finds it, works on it."
-          const researchStart = 0.5; // seconds into phase C
+          // Responder — full research mode starts AFTER the eval pulse.
+          // In alice-asks mode: currentPeer (a remote peer) researches.
+          // In peer-asks mode: Alice researches — her own ring nodes light.
+          const researchStart = 0.5;
           const researchLocalT = Math.max(0, (ph.local * ph.dur - researchStart) / (ph.dur - researchStart));
           if (researchLocalT > 0) {
-            const pulse = 1 + 0.24 * Math.sin(researchLocalT * Math.PI);
-            currentPeer.mesh.scale.setScalar(pulse);
-            const peerBlend = 0.5 + 0.5 * Math.sin(researchLocalT * Math.PI);
-            currentPeer.mesh.material.color.lerpColors(COL.peer, COL.alice, peerBlend * 0.6);
-
-            // sub-graph nodes light in sequence while this peer "reasons"
-            const subs = currentPeer.subNodes;
             const stagger = 0.3;
             const subDur = 0.6;
             const researchDur = (ph.dur - researchStart);
             const tNow = researchLocalT * researchDur;
-            for (let i = 0; i < subs.length; i++) {
-              const tStart = i * stagger;
-              const tEnd = tStart + subDur;
-              if (tNow >= tStart && tNow <= tEnd + 0.3) {
-                const local = Math.min(1, (tNow - tStart) / subDur);
-                const bright = Math.sin(local * Math.PI);
-                subs[i].material.color.lerpColors(COL.peer, COL.alice, bright);
-                subs[i].material.opacity = 0.75 + 0.25 * bright;
-                subs[i].mesh.scale.setScalar(1 + 0.38 * bright);
-                const edge = currentPeer.subEdges[i - 1] || currentPeer.subEdges[i];
-                if (edge) edge.active.opacity = 0.8 * bright;
-              } else if (tNow > tEnd + 0.3) {
-                subs[i].material.color.copy(COL.peer);
-                subs[i].material.opacity = 0.75;
-                subs[i].mesh.scale.setScalar(1);
+
+            if (cycleMode === 'alice-asks') {
+              // Remote peer researches — its sub-graph lights sequentially.
+              const pulse = 1 + 0.24 * Math.sin(researchLocalT * Math.PI);
+              currentPeer.mesh.scale.setScalar(pulse);
+              const peerBlend = 0.5 + 0.5 * Math.sin(researchLocalT * Math.PI);
+              currentPeer.mesh.material.color.lerpColors(COL.peer, COL.alice, peerBlend * 0.6);
+              const subs = currentPeer.subNodes;
+              for (let i = 0; i < subs.length; i++) {
+                const tStart = i * stagger;
+                const tEnd = tStart + subDur;
+                if (tNow >= tStart && tNow <= tEnd + 0.3) {
+                  const local = Math.min(1, (tNow - tStart) / subDur);
+                  const bright = Math.sin(local * Math.PI);
+                  subs[i].material.color.lerpColors(COL.peer, COL.alice, bright);
+                  subs[i].material.opacity = 0.75 + 0.25 * bright;
+                  subs[i].mesh.scale.setScalar(1 + 0.38 * bright);
+                  const edge = currentPeer.subEdges[i - 1] || currentPeer.subEdges[i];
+                  if (edge) edge.active.opacity = 0.8 * bright;
+                } else if (tNow > tEnd + 0.3) {
+                  subs[i].material.color.copy(COL.peer);
+                  subs[i].material.opacity = 0.75;
+                  subs[i].mesh.scale.setScalar(1);
+                }
+              }
+            } else {
+              // Alice researches — her halo pulses and her local ring
+              // nodes light in sequence. Same stagger vocabulary as a
+              // peer's sub-graph so the "working on an answer" beat reads
+              // the same regardless of who the responder is.
+              const pulse = 1 + 0.12 * Math.sin(researchLocalT * Math.PI);
+              aliceCore.scale.setScalar(pulse);
+              aliceHalo.material.opacity = 0.18 + 0.28 * Math.sin(researchLocalT * Math.PI);
+              for (let i = 0; i < aliceNodes.length; i++) {
+                const tStart = i * stagger;
+                const tEnd = tStart + subDur;
+                if (tNow >= tStart && tNow <= tEnd + 0.3) {
+                  const local = Math.min(1, (tNow - tStart) / subDur);
+                  const bright = Math.sin(local * Math.PI);
+                  aliceNodes[i].mesh.material.opacity = 1;
+                  aliceNodes[i].mesh.scale.setScalar(1 + 0.35 * bright);
+                  aliceNodes[i].mesh.material.color.lerpColors(COL.mine, COL.alice, bright * 0.55);
+                } else if (tNow > tEnd + 0.3) {
+                  aliceNodes[i].mesh.material.color.copy(COL.mine);
+                  aliceNodes[i].mesh.scale.setScalar(1);
+                }
               }
             }
           }
@@ -1927,15 +2016,26 @@
             });
             p.subEdges.forEach(e => { e.active.opacity = 0; });
           });
+          // reset alice's ring nodes too — they get lit during peer-asks
+          // phase C research. Leave them alone during phase E of an
+          // alice-asks cycle though (absorb slots handle that).
+          if (ph.name !== 'E_absorb') {
+            for (const n of aliceNodes) {
+              n.mesh.material.color.copy(COL.mine);
+              n.mesh.material.opacity = 1;
+              n.mesh.scale.setScalar(1);
+            }
+          }
         }
 
-        // Phase D — answer beam from peer → alice (stronger)
+        // Phase D — answer beam from RESPONDER → ASKER (stronger).
+        // In alice-asks mode: currentPeer → (0,0). In peer-asks mode:
+        // (0,0) [Alice] → askerPeer.pos.
         if (ph.name === 'D_answer') {
           if (!activeBeam || activeBeam.direction !== 'inbound') {
             clearBeam();
-            activeBeam = buildBeam(currentPeer.pos.clone().setZ(0.3), new THREE.Vector3(0, 0, 0.3));
+            activeBeam = buildBeam(responderPos.clone(), askerPos.clone());
             activeBeam.direction = 'inbound';
-            // bigger packet
             activeBeam.core.geometry.dispose();
             activeBeam.core.geometry = disc(1.9, 24);
             activeBeam.glow.geometry.dispose();
@@ -1951,7 +2051,12 @@
           setStatus({ phase: ph.name, scenario: currentScenario });
         }
 
-        // Phase E — alice absorbs new nodes
+        // Phase E — asker receives the answer.
+        // In alice-asks mode: Alice absorbs 1-2 new nodes into her ring
+        //   (existing absorb-slot machinery).
+        // In peer-asks mode: the asker peer pulses + one of its sub-nodes
+        //   brightens as it receives the answer. Visual analogue of
+        //   "their graph grew," without the pre-built slot infrastructure.
         if (ph.name === 'E_absorb') {
           if (activeBeam) {
             const fadeT = Math.min(1, ph.local * 3);
@@ -1960,19 +2065,32 @@
             activeBeam.glow.material.opacity = 0.7 * (1 - fadeT);
             if (fadeT >= 1) clearBeam();
           }
-          // alice pulse on absorb
-          const pulse = 1 + 0.14 * Math.sin(ph.local * Math.PI);
-          aliceCore.scale.setScalar(pulse);
-          aliceHalo.material.opacity = 0.18 + 0.22 * Math.sin(ph.local * Math.PI);
 
-          // fade-in absorb slots
-          absorbPicked.forEach((slot, i) => {
-            const delay = i * 0.18;
-            const local = Math.max(0, Math.min(1, (ph.local * ph.dur - delay) / 0.8));
-            const k = easeOutCubic(local);
-            slot.material.opacity = k;
-            slot.edgeMat.opacity = 0.18 * k;
-          });
+          if (cycleMode === 'alice-asks') {
+            const pulse = 1 + 0.14 * Math.sin(ph.local * Math.PI);
+            aliceCore.scale.setScalar(pulse);
+            aliceHalo.material.opacity = 0.18 + 0.22 * Math.sin(ph.local * Math.PI);
+            absorbPicked.forEach((slot, i) => {
+              const delay = i * 0.18;
+              const local = Math.max(0, Math.min(1, (ph.local * ph.dur - delay) / 0.8));
+              const k = easeOutCubic(local);
+              slot.material.opacity = k;
+              slot.edgeMat.opacity = 0.18 * k;
+            });
+          } else if (askerPeer) {
+            // peer-asks: grow the asker peer briefly + light its first
+            // sub-node to signal "this peer's graph just absorbed new
+            // research from the network."
+            const pulse = 1 + 0.22 * Math.sin(ph.local * Math.PI);
+            askerPeer.mesh.scale.setScalar(pulse);
+            const bright = Math.sin(ph.local * Math.PI);
+            askerPeer.mesh.material.color.lerpColors(COL.peer, COL.alice, bright * 0.55);
+            if (askerPeer.subNodes[0]) {
+              askerPeer.subNodes[0].material.color.lerpColors(COL.peer, COL.alice, bright);
+              askerPeer.subNodes[0].material.opacity = 0.75 + 0.25 * bright;
+              askerPeer.subNodes[0].mesh.scale.setScalar(1 + 0.4 * bright);
+            }
+          }
           setStatus({ phase: ph.name, scenario: currentScenario });
         }
 
