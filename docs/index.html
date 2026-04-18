@@ -792,6 +792,85 @@
     }
     section.light .chap-num { color: #0f6a46; }
     section.light .chap-num::before { background: #0f6a46; }
+
+    /* ───── chapter 6: thesis / manifesto (light) ───── */
+    .manifesto-body {
+      font-size: 1.02rem;
+      line-height: 1.7;
+      max-width: 62ch;
+      color: var(--paper-mute);
+    }
+    .manifesto-body .manifesto-p {
+      margin-bottom: 1.35rem;
+    }
+    .manifesto-body .manifesto-p strong {
+      color: var(--paper-ink);
+      font-weight: 600;
+    }
+    .manifesto-close {
+      margin-top: 2.4rem;
+      padding-top: 1.75rem;
+      border-top: 1px solid var(--border-light);
+      font-size: 1.75rem;
+      letter-spacing: -0.025em;
+      line-height: 1.18;
+      font-weight: 500;
+      color: var(--paper-ink);
+      font-family: var(--display);
+      max-width: 22ch;
+    }
+    .manifesto-close em {
+      color: #0f6a46;
+      font-style: italic;
+      font-weight: 500;
+    }
+
+    .manifesto-precedent {
+      margin-top: 2rem;
+      font-family: var(--mono);
+      font-size: 0.86rem;
+      display: grid;
+      gap: 0;
+      border-top: 1px solid var(--border-light);
+      max-width: 30ch;
+    }
+    .mp-row {
+      display: grid;
+      grid-template-columns: 4.5rem 1fr;
+      padding: 0.68rem 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .mp-year {
+      color: var(--paper-mute);
+    }
+    .mp-name {
+      color: var(--paper-ink);
+      font-weight: 500;
+    }
+    .mp-break .mp-name {
+      color: var(--paper-mute);
+      font-weight: 400;
+      font-style: italic;
+    }
+    .mp-ellipsis::before {
+      content: '…  ';
+      color: var(--paper-mute);
+    }
+    .mp-us .mp-name {
+      color: #0f6a46;
+    }
+    .mp-us {
+      position: relative;
+    }
+    .mp-us::before {
+      content: '';
+      position: absolute;
+      left: -10px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #0f6a46;
+    }
   </style>
 </head>
 <body>
@@ -809,6 +888,7 @@
         <a href="#identity">Identity</a>
         <a href="#bench">Benchmark</a>
         <a href="#rooms">How to join</a>
+        <a href="#manifesto">Thesis</a>
       </div>
       <a class="nav-cta" href="https://github.com/SaharBarak/wellinformed">
         github.com/SaharBarak/wellinformed
@@ -1169,6 +1249,67 @@
               <span class="line"><span class="c">    ↳ floodsub@11.0.18 targets interface ^3.2.2</span><span class="cursor-blink"></span></span>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────── CHAPTER 06 — the thesis (light) ───────────── -->
+  <section class="light" id="manifesto">
+    <div class="shell">
+      <div class="chap-num" data-reveal>Chapter 06 — The thesis</div>
+      <div class="chap">
+        <div>
+          <h2 data-reveal style="--d: 1">
+            The cooperation web<br/>is <em>older</em> than you think.
+          </h2>
+          <p class="chap-intro hush" data-reveal style="--d: 2">
+            Giant platforms didn't invent the internet. They won a
+            chapter of it. The chapter before that &mdash; the one that
+            worked without anyone's permission &mdash; ran on peers.
+          </p>
+
+          <div class="manifesto-precedent" data-reveal style="--d: 3">
+            <div class="mp-row"><span class="mp-year">2001</span><span class="mp-name">BitTorrent</span></div>
+            <div class="mp-row"><span class="mp-year">2001</span><span class="mp-name">Kazaa</span></div>
+            <div class="mp-row"><span class="mp-year">2002</span><span class="mp-name">eMule</span></div>
+            <div class="mp-row"><span class="mp-year">2005</span><span class="mp-name">uTorrent</span></div>
+            <div class="mp-row mp-break"><span class="mp-year">&nbsp;</span><span class="mp-name mp-ellipsis">platforms won the next decade</span></div>
+            <div class="mp-row mp-us"><span class="mp-year">2026</span><span class="mp-name">wellinformed</span></div>
+          </div>
+        </div>
+
+        <div class="manifesto-body" data-reveal style="--d: 2">
+          <p class="manifesto-p">
+            Before walled gardens won the middle chapter, the internet's
+            first peer-to-peer generation proved humans cooperating
+            directly move more data, faster, at a fraction of the cost of
+            humans renting from an intermediary. The architecture worked.
+            The platform model beat it on distribution and payment rails
+            &mdash; not on performance, not on economics.
+          </p>
+          <p class="manifesto-p">
+            And the platforms are exhausting themselves now. API pricing
+            that only goes up. Walled gardens that swallow your training
+            data, your sessions, your identity, your graph. A model where
+            every human transaction routes through a rent-seeker &mdash;
+            a model that can't survive the scale AI is about to demand.
+          </p>
+          <p class="manifesto-p">
+            <strong>The next web runs on cooperation.</strong> The way
+            we do research. Train models. Run them. Authenticate each
+            other. Humans helping humans, at the scale a billion peers
+            can reach, with nobody owning the rail. Every piece of
+            research done once and shared; every credential verified once
+            and trusted; every answer compounding across everyone who
+            shows up. Exponentially less effort. Exponentially more
+            value per transaction. Humans-for-humans, not humans-for-a-
+            dashboard.
+          </p>
+          <p class="manifesto-close">
+            This is the first step.<br/>
+            <em>Meet wellinformed.</em>
+          </p>
         </div>
       </div>
     </div>
