@@ -420,20 +420,20 @@
       line-height: 1.55;
     }
 
-    /* ───── chapter 2: competitor table (dark) ───── */
+    /* ───── chapter 2: competitor table (light) ───── */
     .competitor-table {
       font-family: var(--mono);
       font-size: 0.86rem;
       display: grid;
       gap: 0;
-      border-top: 1px solid var(--border-dark);
+      border-top: 1px solid var(--border-light);
     }
     .ct-row {
       display: grid;
       grid-template-columns: 1.3fr 0.7fr 1.5fr 0.9fr;
       padding: 0.95rem 0;
       gap: 1rem;
-      border-bottom: 1px solid var(--border-dark);
+      border-bottom: 1px solid var(--border-light);
       align-items: baseline;
     }
     @media (max-width: 700px) {
@@ -442,34 +442,34 @@
       .ct-row > *:nth-child(4) { grid-column: 1 / -1; font-size: 0.78rem; }
     }
     .ct-row.head {
-      color: var(--ink-mute);
+      color: var(--paper-mute);
       font-size: 0.72rem;
       letter-spacing: 0.1em;
       text-transform: uppercase;
       border-top: none;
       padding-top: 0;
     }
-    .ct-name { color: #e8e8ed; font-weight: 500; }
-    .ct-stars { color: var(--ink-mute); }
-    .ct-claim { color: var(--ink-mute); }
+    .ct-name { color: var(--paper-ink); font-weight: 500; }
+    .ct-stars { color: var(--paper-mute); }
+    .ct-claim { color: var(--paper-mute); }
     .ct-verdict {
-      color: #e0b263;
+      color: #8a5a16;
       font-weight: 500;
     }
-    .ct-verdict.dispute { color: #e37474; }
+    .ct-verdict.dispute { color: #a8322d; }
 
     .silo-note {
       margin-top: 1.8rem;
       font-size: 0.88rem;
       line-height: 1.6;
       max-width: 56ch;
-      color: var(--ink-mute);
+      color: var(--paper-mute);
     }
     .silo-note code.mono {
-      color: var(--accent);
+      color: #0f6a46;
       font-size: 0.9em;
       padding: 0.08em 0.35em;
-      background: rgba(52, 211, 153, 0.08);
+      background: rgba(15, 106, 70, 0.08);
       border-radius: 4px;
     }
 
@@ -793,34 +793,34 @@
     section.light .chap-num { color: #0f6a46; }
     section.light .chap-num::before { background: #0f6a46; }
 
-    /* ───── chapter 1: thesis / manifesto (light) ───── */
+    /* ───── chapter 1: thesis / manifesto (dark) ───── */
     .manifesto-body {
       font-size: 1.02rem;
       line-height: 1.7;
       max-width: 62ch;
-      color: var(--paper-mute);
+      color: #c7c7d0;
     }
     .manifesto-body .manifesto-p {
       margin-bottom: 1.35rem;
     }
     .manifesto-body .manifesto-p strong {
-      color: var(--paper-ink);
+      color: #f0f0f5;
       font-weight: 600;
     }
     .manifesto-close {
       margin-top: 2.4rem;
       padding-top: 1.75rem;
-      border-top: 1px solid var(--border-light);
+      border-top: 1px solid var(--border-dark);
       font-size: 1.75rem;
       letter-spacing: -0.025em;
       line-height: 1.18;
       font-weight: 500;
-      color: var(--paper-ink);
+      color: #f0f0f5;
       font-family: var(--display);
       max-width: 22ch;
     }
     .manifesto-close em {
-      color: #0f6a46;
+      color: var(--accent);
       font-style: italic;
       font-weight: 500;
     }
@@ -831,33 +831,33 @@
       font-size: 0.86rem;
       display: grid;
       gap: 0;
-      border-top: 1px solid var(--border-light);
+      border-top: 1px solid var(--border-dark);
       max-width: 30ch;
     }
     .mp-row {
       display: grid;
       grid-template-columns: 4.5rem 1fr;
       padding: 0.68rem 0;
-      border-bottom: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-dark);
     }
     .mp-year {
-      color: var(--paper-mute);
+      color: var(--ink-mute);
     }
     .mp-name {
-      color: var(--paper-ink);
+      color: #e8e8ed;
       font-weight: 500;
     }
     .mp-break .mp-name {
-      color: var(--paper-mute);
+      color: var(--ink-mute);
       font-weight: 400;
       font-style: italic;
     }
     .mp-ellipsis::before {
       content: '…  ';
-      color: var(--paper-mute);
+      color: var(--ink-mute);
     }
     .mp-us .mp-name {
-      color: #0f6a46;
+      color: var(--accent);
     }
     .mp-us {
       position: relative;
@@ -869,7 +869,7 @@
       top: 0;
       bottom: 0;
       width: 2px;
-      background: #0f6a46;
+      background: var(--accent);
     }
   </style>
 </head>
@@ -949,8 +949,8 @@
     </div>
   </section>
 
-  <!-- ───────────── CHAPTER 01 — the thesis (light) ───────────── -->
-  <section class="light" id="manifesto">
+  <!-- ───────────── CHAPTER 01 — the thesis (dark) ───────────── -->
+  <section id="manifesto">
     <div class="shell">
       <div class="chap-num" data-reveal>Chapter 01 — The thesis</div>
       <div class="chap">
@@ -1010,8 +1010,8 @@
     </div>
   </section>
 
-  <!-- ───────────── CHAPTER 02 — the treadmill (dark) ───────────── -->
-  <section id="silo">
+  <!-- ───────────── CHAPTER 02 — the treadmill (light) ───────────── -->
+  <section class="light" id="silo">
     <div class="shell">
       <div class="chap-num" data-reveal>Chapter 02 — Status quo</div>
       <div class="chap">
