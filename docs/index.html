@@ -455,6 +455,21 @@
     }
     .ct-verdict.dispute { color: #e37474; }
 
+    .silo-note {
+      margin-top: 1.8rem;
+      font-size: 0.88rem;
+      line-height: 1.6;
+      max-width: 56ch;
+      color: var(--ink-mute);
+    }
+    .silo-note code.mono {
+      color: var(--accent);
+      font-size: 0.9em;
+      padding: 0.08em 0.35em;
+      background: rgba(52, 211, 153, 0.08);
+      border-radius: 4px;
+    }
+
     /* ───── pillars (chapter 2, light) ───── */
     .pillars {
       display: grid;
@@ -907,12 +922,12 @@
               <span class="ct-verdict">Vendor page only</span>
             </div>
           </div>
-          <p class="bench-note hush" data-reveal style="--d: 3" style2="margin-top:1.6rem">
-            <br>Every number above was published by the vendor. Every dispute
+          <p class="silo-note hush" data-reveal style="--d: 3">
+            Every number above was published by the vendor. Every dispute
             was filed by another vendor. Three stacks, three interpretations
             of the same evaluation set. Verified via
-            <code class="mono" style="color:var(--accent);font-size:0.9em">gh api</code> and each project's own issue tracker in
-            <code class="mono" style="color:var(--accent);font-size:0.9em">.planning/BENCH-COMPETITORS.md</code>.
+            <code class="mono">gh api</code> and each project's own issue tracker in
+            <code class="mono">.planning/BENCH-COMPETITORS.md</code>.
           </p>
         </div>
       </div>
