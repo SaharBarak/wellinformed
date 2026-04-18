@@ -142,7 +142,9 @@ node scripts/bench-consolidation.mjs <room>       # storage + quality gate
 **Commits**: `f6ab7f1`, `832c91c`, `0385f69`, `6d7ec77`
 **Tests**: `tests/consolidated-memory.test.ts`, `tests/consolidator.test.ts` (26 tests green)
 
-**Production caveat (v4.0)**: consolidation runs without a cross-process write lock. Run with `wellinformed daemon` stopped to avoid racing ingestion. Proper lock lands in v4.1.
+**Coordination with the daemon**: Both `wellinformed daemon` and `wellinformed consolidate run` acquire the cross-process write lock at `<home>/wellinformed.lock` (file-based exclusive create with stale-PID recovery). The daemon holds it for its lifetime + refreshes every 20s; consolidate waits up to 30s for it. **No "stop the daemon first" caveat — run anytime.** Stale-recovery handles the case where a prior holder crashed without releasing.
+
+**Atomic prune** — pass `--prune` to `wellinformed consolidate run` and the source raw entries get deleted from BOTH the graph and the vector index after successful consolidation. Closes the §2j quality regression by removing BM25 competition from the still-indexed raw text. Mutually exclusive with `--dry-run`.
 
 ---
 
@@ -249,9 +251,10 @@ To consolidate an existing sessions room:
 
 ```bash
 ollama pull qwen2.5:1.5b
-wellinformed daemon stop           # no write-lock in v4.0 — stop the daemon
 wellinformed consolidate run sessions --threshold 0.8 --min-size 5
-wellinformed daemon start
+# add --prune to atomically delete source entries (closes §2j quality regression):
+wellinformed consolidate run sessions --threshold 0.8 --min-size 5 --prune
+# the daemon coordinates via the cross-process write lock — no stop required.
 ```
 
 ---
@@ -262,7 +265,8 @@ Explicitly deferred from v4.0:
 
 - **v4.1 — Native binary client.** Rust `wellinformed-cli` wrapper that speaks the IPC protocol directly, bypassing Node boot. Target: warm-hit latency 100 ms → 15 ms.
 - **v4.1 — BIP39 recovery mnemonic.** v4 ships 64-char hex as the recovery format. BIP39 adds `@scure/bip39` (40 KB audited dep) for human-readable 12/24-word phrases.
-- **v4.1 — Cross-process write lock.** Removes the "stop daemon during consolidate" caveat.
+- ✅ **v4.0 — Cross-process write lock** (`src/infrastructure/process-lock.ts`, commit `5591757`). Daemon and mutating CLI commands coordinate via `<home>/wellinformed.lock`. Stale-PID recovery + 20s heartbeat refresh. No "stop daemon" caveat anymore.
+- ✅ **v4.0 — Atomic prune** (`--prune` flag, commit `3ed850f`). Source raw entries deleted from graph + vectors after consolidation; closes the §2j quality regression by removing BM25 competition.
 - **v4.2 — HippoRAG-2 multi-hop PPR gate.** Measure the existing `src/domain/pagerank.ts` primitive against MuSiQue + HotpotQA. If +3pt NDCG@10 or +5pt R@5, enable `multi_hop: true` flag on MCP queries.
 - **v4.2 — Contextual Retrieval with a larger local LLM.** Current null was measured with Qwen2.5-0.5B (too small). Retry with Qwen3 or Llama-3.2 once they have embedding-pair ONNX ports.
 - **v4.3 — WASM browser runtime.** Same Rust core compiled to WASM for in-browser peers.
