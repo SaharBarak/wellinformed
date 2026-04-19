@@ -621,6 +621,53 @@
     }
     .bench-disclose b { color: var(--paper-ink); font-weight: 500; }
 
+    .v4-speed {
+      margin-top: 2.3rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border-light);
+    }
+    .v4-speed-head {
+      font-family: var(--mono);
+      font-size: 0.74rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: #0f6a46;
+      margin-bottom: 1rem;
+    }
+    .v4-speed-head::before {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 1px;
+      background: #0f6a46;
+      margin-right: 0.65rem;
+      vertical-align: middle;
+    }
+    .v4-speed-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.25rem 1.8rem;
+    }
+    @media (max-width: 600px) { .v4-speed-grid { grid-template-columns: 1fr; } }
+    .v4-stat {
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border-light);
+    }
+    .v4-val {
+      font-family: var(--mono);
+      font-size: 1.45rem;
+      font-weight: 500;
+      color: #0f6a46;
+      letter-spacing: -0.01em;
+      margin-bottom: 0.35rem;
+    }
+    .v4-label {
+      font-size: 0.85rem;
+      color: var(--paper-mute);
+      line-height: 1.5;
+      max-width: 42ch;
+    }
+
     /* ───── chapter 6: rooms + oracle (dark) ───── */
     .rooms {
       margin-top: 1.5rem;
@@ -904,7 +951,7 @@
         <div>
           <div class="hero-eyebrow" data-reveal>
             <span class="dot" aria-hidden="true"></span>
-            v2.1 — peer federation + decentralized identity
+            v4.0 &mdash; agent brain: cached queries, consolidation, native CLI
           </div>
 
           <h1 data-reveal style="--d: 1">
@@ -932,9 +979,9 @@
           </div>
 
           <div class="hero-meta" data-reveal style="--d: 4">
-            <div><b>10,483</b>nodes indexed</div>
-            <div><b>21</b>MCP tools</div>
-            <div><b>434</b>tests green</div>
+            <div><b>27 ms</b>cached query</div>
+            <div><b>9.9&times;</b>indexing throughput</div>
+            <div><b>48&times;</b>vector compression</div>
             <div><b>MIT</b>no cloud, no key</div>
           </div>
         </div>
@@ -1158,8 +1205,8 @@
             <div class="id-point">
               <span class="id-num">01</span>
               <div>
-                <b>Your devices, your call.</b>
-                <p>Authorize a new laptop, revoke a stolen phone. Each device gets a key your user identity signs. Compromise a device and the rest of your identity stays intact.</p>
+                <b>Your devices, your call. Your identity, yours to move.</b>
+                <p>Authorize a new laptop, revoke a stolen phone — each device gets a key your user identity signs. Lose every device? Export a 24-word recovery phrase (BIP39) once; restore the same identity on any machine forever. No support ticket, no account reset.</p>
               </div>
             </div>
             <div class="id-point">
@@ -1239,7 +1286,29 @@
             <code class="mono" style="display:inline-block;margin-top:0.4rem;padding:0.15em 0.45em;background:rgba(22,22,25,0.05);border-radius:4px">node scripts/bench-beir-sota.mjs scifact --hybrid</code>
           </p>
 
-          <div class="bench-disclose" data-reveal style="--d: 9">
+          <div class="v4-speed" data-reveal style="--d: 9">
+            <div class="v4-speed-head">What v4 changed</div>
+            <div class="v4-speed-grid">
+              <div class="v4-stat">
+                <div class="v4-val">27&nbsp;ms</div>
+                <div class="v4-label">cached query via the native Rust CLI &rarr; daemon IPC &rarr; L1 hit. 33&times; the cold boot.</div>
+              </div>
+              <div class="v4-stat">
+                <div class="v4-val">9.9&times;</div>
+                <div class="v4-label">indexing throughput when parallel callers coalesce into batched embeds. 2.9&times; on the serial path — on by default.</div>
+              </div>
+              <div class="v4-stat">
+                <div class="v4-val">48&times;</div>
+                <div class="v4-label">on-disk vector compression via sign-bit-packed Matryoshka-512. &minus;1.79 NDCG worst case across four BEIR sets.</div>
+              </div>
+              <div class="v4-stat">
+                <div class="v4-val">6.29&times;</div>
+                <div class="v4-label">graph shrinkage from episodic-to-semantic consolidation: 7,002 raw session entries &rarr; 1,113 distilled memories, no content loss.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bench-disclose" data-reveal style="--d: 10">
             <b>What didn't work.</b> We tried two other approaches and
             both failed &mdash; an extra reranking step that made results
             <i>worse</i>, and a room-based routing scheme that barely
