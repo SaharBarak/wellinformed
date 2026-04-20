@@ -23,6 +23,17 @@ Set BorderRadius 10
 Set WindowBar Colorful
 Set WindowBarSize 30
 
+# ─── hidden setup — make zsh treat `# ...` lines as comments ─
+# Without this, the narrative `# beat` lines below trigger
+# "zsh: command not found: #" on each Enter.
+Hide
+Type "setopt interactive_comments"
+Enter
+Type "clear"
+Enter
+Sleep 300ms
+Show
+
 # ─── Beat 1 — peer identity (did:key + libp2p) ─────────────────
 Type "# who am i — did:key + libp2p peer"
 Sleep 600ms
