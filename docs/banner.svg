@@ -1,0 +1,119 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 640" fill="none" role="img" aria-label="wellinformed — the network before the web. peer-to-peer knowledge graph for AI agents.">
+  <!-- ─── background ─────────────────────────────────────── -->
+  <defs>
+    <radialGradient id="bgGlow" cx="50%" cy="45%" r="60%">
+      <stop offset="0%"  stop-color="#14141f" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#0c0c14" stop-opacity="1"/>
+    </radialGradient>
+    <radialGradient id="coreGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#34d399" stop-opacity="0.30"/>
+      <stop offset="55%" stop-color="#34d399" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="divider" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%"  stop-color="#34d399" stop-opacity="0"/>
+      <stop offset="50%" stop-color="#34d399" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="640" fill="url(#bgGlow)"/>
+
+  <!-- ─── hero mesh — two-peer-network tunnel ───────────── -->
+  <g transform="translate(640 300)">
+    <!-- corona -->
+    <circle r="260" fill="url(#coreGlow)"/>
+
+    <!-- LEFT peer cluster (your node) — 6-peer mesh, solid -->
+    <g transform="translate(-180 0)">
+      <g stroke="#34d399" stroke-width="1.6" opacity="0.5" fill="none" stroke-linecap="round">
+        <line x1="0"   y1="-66" x2="-58" y2="-22"/>
+        <line x1="0"   y1="-66" x2="58"  y2="-22"/>
+        <line x1="-58" y1="-22" x2="-58" y2="46"/>
+        <line x1="58"  y1="-22" x2="58"  y2="46"/>
+        <line x1="-58" y1="46"  x2="0"   y2="80"/>
+        <line x1="58"  y1="46"  x2="0"   y2="80"/>
+        <line x1="0"   y1="-66" x2="0"   y2="80"/>
+        <line x1="-58" y1="-22" x2="58"  y2="46"/>
+        <line x1="58"  y1="-22" x2="-58" y2="46"/>
+      </g>
+      <g fill="#0c0c14" stroke="#34d399" stroke-width="2">
+        <circle cx="0"   cy="-66" r="5"/>
+        <circle cx="-58" cy="-22" r="5"/>
+        <circle cx="58"  cy="-22" r="5"/>
+        <circle cx="-58" cy="46"  r="5"/>
+        <circle cx="58"  cy="46"  r="5"/>
+        <circle cx="0"   cy="80"  r="5"/>
+      </g>
+      <circle r="16" fill="#34d399"/>
+      <circle r="22" fill="none" stroke="#34d399" stroke-width="1.2" opacity="0.55"/>
+    </g>
+
+    <!-- TUNNEL — dashed emerald between the two cluster cores -->
+    <line x1="-156" y1="0" x2="156" y2="0" stroke="#34d399" stroke-width="2.2" stroke-dasharray="6 5" opacity="0.75"/>
+
+    <!-- RIGHT peer cluster (peer node) — lighter, outlined core -->
+    <g transform="translate(180 0)">
+      <g stroke="#34d399" stroke-width="1.6" opacity="0.5" fill="none" stroke-linecap="round">
+        <line x1="0"   y1="-66" x2="-58" y2="-22"/>
+        <line x1="0"   y1="-66" x2="58"  y2="-22"/>
+        <line x1="-58" y1="-22" x2="-58" y2="46"/>
+        <line x1="58"  y1="-22" x2="58"  y2="46"/>
+        <line x1="-58" y1="46"  x2="0"   y2="80"/>
+        <line x1="58"  y1="46"  x2="0"   y2="80"/>
+        <line x1="0"   y1="-66" x2="0"   y2="80"/>
+        <line x1="-58" y1="-22" x2="58"  y2="46"/>
+        <line x1="58"  y1="-22" x2="-58" y2="46"/>
+      </g>
+      <g fill="#0c0c14" stroke="#34d399" stroke-width="2">
+        <circle cx="0"   cy="-66" r="5"/>
+        <circle cx="-58" cy="-22" r="5"/>
+        <circle cx="58"  cy="-22" r="5"/>
+        <circle cx="-58" cy="46"  r="5"/>
+        <circle cx="58"  cy="46"  r="5"/>
+        <circle cx="0"   cy="80"  r="5"/>
+      </g>
+      <circle r="12" fill="none" stroke="#34d399" stroke-width="2.4"/>
+    </g>
+  </g>
+
+  <!-- ─── wordmark ───────────────────────────────────────── -->
+  <text x="640" y="80" text-anchor="middle"
+        font-family="'Outfit', 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif"
+        font-size="76" font-weight="800"
+        fill="#f7f4ec" letter-spacing="-3">wellinformed</text>
+
+  <!-- ─── tagline ────────────────────────────────────────── -->
+  <text x="640" y="118" text-anchor="middle"
+        font-family="'Outfit', 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif"
+        font-size="22" font-weight="400" font-style="italic"
+        fill="#8c8c98" letter-spacing="0.6">the network before the web.</text>
+
+  <!-- ─── divider ────────────────────────────────────────── -->
+  <line x1="240" y1="540" x2="1040" y2="540" stroke="url(#divider)" stroke-width="1.4"/>
+
+  <!-- ─── stats strip ────────────────────────────────────── -->
+  <g font-family="'JetBrains Mono', 'SF Mono', 'Menlo', 'Consolas', monospace"
+     text-anchor="middle" fill="#b4b4c0">
+    <g font-size="26" font-weight="600" fill="#34d399">
+      <text x="180"  y="586">75.22%</text>
+      <text x="400"  y="586">11ms</text>
+      <text x="640"  y="586">48×</text>
+      <text x="880"  y="586">91.9%</text>
+      <text x="1100" y="586">13</text>
+    </g>
+    <g font-size="13" font-weight="500" fill="#8c8c98" letter-spacing="0.6">
+      <text x="180"  y="610">NDCG@10 · BEIR SciFact</text>
+      <text x="400"  y="610">p50 query latency</text>
+      <text x="640"  y="610">vector compression</text>
+      <text x="880"  y="610">cross-model bridge</text>
+      <text x="1100" y="610">documented null attacks</text>
+    </g>
+  </g>
+
+  <!-- ─── corner wordmark & license ──────────────────────── -->
+  <g font-family="'JetBrains Mono', 'SF Mono', 'Menlo', 'Consolas', monospace"
+     font-size="12" fill="#5b5b63" letter-spacing="0.4">
+    <text x="44" y="48">github.com/SaharBarak/wellinformed</text>
+    <text x="1236" y="48" text-anchor="end">MIT · libp2p · did:key · CPU-only</text>
+  </g>
+</svg>

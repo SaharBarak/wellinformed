@@ -1,31 +1,54 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 200" fill="none">
-  <!-- Neutral dark base — Zinc-950 -->
-  <rect width="800" height="200" rx="0" fill="#09090b"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 240" fill="none" role="img" aria-label="wellinformed — the network before the web">
+  <!-- background: ink-900 from the site token palette -->
+  <rect width="960" height="240" rx="0" fill="#0c0c14"/>
 
-  <!-- Graph icon: minimal, single accent (Emerald-500), 4 nodes + 3 edges -->
-  <g transform="translate(48, 32)">
-    <!-- Edges — thin, emerald at low opacity -->
-    <line x1="32" y1="68" x2="88" y2="40" stroke="#10b981" stroke-width="1.5" opacity="0.4"/>
-    <line x1="32" y1="68" x2="72" y2="108" stroke="#10b981" stroke-width="1.5" opacity="0.4"/>
-    <line x1="88" y1="40" x2="72" y2="108" stroke="#10b981" stroke-width="1.5" opacity="0.4"/>
-    <!-- Tunnel edge — dashed, subtler -->
-    <line x1="72" y1="108" x2="120" y2="96" stroke="#10b981" stroke-width="1" opacity="0.25" stroke-dasharray="4,3"/>
+  <!-- radial corona behind the mark -->
+  <defs>
+    <radialGradient id="corona" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"  stop-color="#34d399" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#34d399" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <circle cx="140" cy="120" r="96" fill="url(#corona)"/>
 
-    <!-- Nodes — solid emerald, varying size = importance -->
-    <circle cx="32" cy="68" r="8" fill="#10b981"/>
-    <circle cx="88" cy="40" r="6" fill="#10b981"/>
-    <circle cx="72" cy="108" r="10" fill="#10b981"/>
-    <!-- Tunnel node — outline only -->
-    <circle cx="120" cy="96" r="5" fill="none" stroke="#10b981" stroke-width="1.5" opacity="0.5"/>
+  <!-- 6-peer mesh mark + bright central core ('you') -->
+  <g transform="translate(140 120)">
+    <g stroke="#34d399" stroke-width="1.8" stroke-linecap="round" opacity="0.55" fill="none">
+      <line x1="0"   y1="-60" x2="-52" y2="-18"/>
+      <line x1="0"   y1="-60" x2="52"  y2="-18"/>
+      <line x1="-52" y1="-18" x2="-52" y2="42"/>
+      <line x1="52"  y1="-18" x2="52"  y2="42"/>
+      <line x1="-52" y1="42"  x2="0"   y2="72"/>
+      <line x1="52"  y1="42"  x2="0"   y2="72"/>
+      <line x1="0"   y1="-60" x2="0"   y2="72"/>
+      <line x1="-52" y1="-18" x2="52"  y2="42"/>
+      <line x1="52"  y1="-18" x2="-52" y2="42"/>
+    </g>
+    <g fill="#0c0c14" stroke="#34d399" stroke-width="2.4">
+      <circle cx="0"   cy="-60" r="6"/>
+      <circle cx="-52" cy="-18" r="6"/>
+      <circle cx="52"  cy="-18" r="6"/>
+      <circle cx="-52" cy="42"  r="6"/>
+      <circle cx="52"  cy="42"  r="6"/>
+      <circle cx="0"   cy="72"  r="6"/>
+    </g>
+    <circle r="16" fill="#34d399"/>
+    <circle r="22" fill="none" stroke="#34d399" stroke-width="1.4" opacity="0.55"/>
   </g>
 
-  <!-- Typography: tracking-tight, clean sans -->
-  <text x="200" y="120" font-family="'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="64" font-weight="700" fill="#fafafa" letter-spacing="-3">
-    wellinformed
-  </text>
+  <!-- wordmark -->
+  <text x="288" y="138"
+        font-family="'Outfit', 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif"
+        font-size="76" font-weight="700"
+        fill="#f7f4ec" letter-spacing="-2.4">wellinformed</text>
 
-  <!-- Subtle tagline -->
-  <text x="202" y="152" font-family="'Inter', -apple-system, sans-serif" font-size="14" font-weight="400" fill="#71717a" letter-spacing="0.5">
-    persistent research memory for AI agents
-  </text>
+  <!-- tagline -->
+  <text x="290" y="176"
+        font-family="'Outfit', 'Inter', 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif"
+        font-size="20" font-weight="400" font-style="italic"
+        fill="#8c8c98" letter-spacing="0.4">the network before the web.</text>
+
+  <!-- hairline accent -->
+  <line x1="290" y1="198" x2="370" y2="198" stroke="#34d399" stroke-width="2" opacity="0.7" stroke-linecap="round"/>
 </svg>
