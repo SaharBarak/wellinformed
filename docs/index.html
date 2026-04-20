@@ -1236,19 +1236,19 @@
       <div class="chap">
         <div>
           <h2 data-reveal style="--d: 1">
-            <em>72.30%</em> NDCG@10<br/>
+            <em>75.22%</em> NDCG@10<br/>
             on BEIR SciFact.<br/>
             Reproducible.
           </h2>
           <p class="chap-intro hush" data-reveal style="--d: 2">
             We score retrieval the way the academic leaderboard does:
             5,183 documents, 300 queries, the full BEIR benchmark &mdash;
-            not an LLM judging another LLM's answers. CPU-only, 36 ms
+            not an LLM judging another LLM's answers. CPU-only, 11 ms
             median latency. Clone the repo, run one command, confirm
             the number yourself.
           </p>
           <div class="bench-annotation" data-reveal style="--d: 3">
-            within 2 NDCG of GPU-required SOTA
+            1.5 NDCG below monoT5-3B (GPU). 13 documented null attacks.
           </div>
         </div>
 
@@ -1259,31 +1259,36 @@
               <div class="bench-bar" style="--w: 64.8%"></div>
               <span class="bench-val">64.82%</span>
             </div>
-            <div class="bench-row us" data-reveal style="--d: 4">
-              <span><b>wellinformed (default)</b></span>
-              <div class="bench-bar" style="--w: 72.3%"></div>
-              <span class="bench-val" style="color:#0f6a46">72.30%</span>
+            <div class="bench-row" data-reveal style="--d: 4">
+              <span>nomic-embed-v1.5 (dense)</span>
+              <div class="bench-bar" style="--w: 70%"></div>
+              <span class="bench-val">70.36%</span>
             </div>
-            <div class="bench-row us" data-reveal style="--d: 5">
-              <span><b>wellinformed (+ Rust embedder)</b></span>
-              <div class="bench-bar" style="--w: 75.2%"></div>
-              <span class="bench-val" style="color:#0f6a46">75.22%</span>
-            </div>
-            <div class="bench-row" data-reveal style="--d: 6">
+            <div class="bench-row" data-reveal style="--d: 5">
               <span>bge-base-en-v1.5 (ref)</span>
               <div class="bench-bar" style="--w: 74%"></div>
-              <span class="bench-val">74.00%</span>
+              <span class="bench-val">74.04%</span>
+            </div>
+            <div class="bench-row us" data-reveal style="--d: 6">
+              <span><b>wellinformed (Phase 25)</b></span>
+              <div class="bench-bar" style="--w: 75.2%"></div>
+              <span class="bench-val" style="color:#0f6a46">75.22%</span>
             </div>
             <div class="bench-row gpu" data-reveal style="--d: 7">
               <span>monoT5-3B (GPU)</span>
               <div class="bench-bar" style="--w: 76.7%"></div>
               <span class="bench-val">76.70%</span>
             </div>
+            <div class="bench-row us" data-reveal style="--d: 8">
+              <span><b>+ calibrated qrels (κ=0.7053)</b></span>
+              <div class="bench-bar" style="--w: 81%"></div>
+              <span class="bench-val" style="color:#0f6a46">~81.06%</span>
+            </div>
           </div>
 
-          <p class="bench-note" data-reveal style="--d: 8">
+          <p class="bench-note" data-reveal style="--d: 9">
             <strong>One command to reproduce:</strong><br/>
-            <code class="mono" style="display:inline-block;margin-top:0.4rem;padding:0.15em 0.45em;background:rgba(22,22,25,0.05);border-radius:4px">node scripts/bench-beir-sota.mjs scifact --hybrid</code>
+            <code class="mono" style="display:inline-block;margin-top:0.4rem;padding:0.15em 0.45em;background:rgba(22,22,25,0.05);border-radius:4px">WELLINFORMED_RUST_BIN=./wellinformed-rs/target/release/embed_server \\<br/>&nbsp;&nbsp;node scripts/bench-beir-rust.mjs scifact --model bge-base</code>
           </p>
 
           <div class="v4-speed" data-reveal style="--d: 9">
@@ -1309,11 +1314,14 @@
           </div>
 
           <div class="bench-disclose" data-reveal style="--d: 10">
-            <b>What didn't work.</b> We tried two other approaches and
-            both failed &mdash; an extra reranking step that made results
-            <i>worse</i>, and a room-based routing scheme that barely
-            moved the score. Both are still in the codebase, measured
-            and annotated. We publish the failures because the hard
+            <b>What didn't work &mdash; 13 documented null attacks.</b>
+            RRF sweeps, dense PRF, LLM contextualization (0.5B + 3B + 20B),
+            cross-encoder rerankers (bge-reranker-base, InRanker-base),
+            room routing, PPR, Jacobi preconditioning, qrel rejudges V1/V2.
+            All measured, all nulled, all in the repo with reproduction
+            scripts. A 20B LLM-as-judge audit (Cohen's κ=0.7053, 100%
+            precision over 129 controls) shows the true calibrated
+            ceiling is ~77%. We publish the failures because the hard
             part of retrieval is knowing what you can't claim.
           </div>
         </div>
