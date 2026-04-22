@@ -1,0 +1,205 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1120" fill="none" role="img" aria-label="Claude Code memory stack — canonical today vs federated with wellinformed">
+  <!-- ─── tokens ────────────────────────────────────────── -->
+  <defs>
+    <radialGradient id="corona" cx="50%" cy="40%" r="55%">
+      <stop offset="0%"  stop-color="#14141f" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#0c0c14" stop-opacity="1"/>
+    </radialGradient>
+    <linearGradient id="divider" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%"  stop-color="#34d399" stop-opacity="0"/>
+      <stop offset="15%" stop-color="#34d399" stop-opacity="0.45"/>
+      <stop offset="85%" stop-color="#34d399" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#34d399" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1400" height="1120" fill="url(#corona)"/>
+
+  <!-- ─── title band ────────────────────────────────────── -->
+  <g font-family="'Outfit','Inter','SF Pro Display',-apple-system,'Helvetica Neue',Arial,sans-serif" fill="#f7f4ec">
+    <text x="700" y="62" text-anchor="middle" font-size="40" font-weight="700" letter-spacing="-1.6">Claude Code memory stack</text>
+    <text x="700" y="98" text-anchor="middle" font-size="18" font-weight="400" font-style="italic" fill="#8c8c98" letter-spacing="0.3">canonical today → federated with wellinformed</text>
+  </g>
+
+  <!-- ─── divider ───────────────────────────────────────── -->
+  <line x1="700" y1="150" x2="700" y2="1040" stroke="url(#divider)" stroke-width="1.2"/>
+
+  <!-- ─── column headers ────────────────────────────────── -->
+  <g font-family="'JetBrains Mono','SF Mono','Menlo','Consolas',monospace" font-size="13" font-weight="600" letter-spacing="1.4">
+    <text x="64" y="168" fill="#5b5b63">TODAY</text>
+    <text x="724" y="168" fill="#34d399">WITH WELLINFORMED</text>
+  </g>
+
+  <!-- ─── LEFT column — canonical stack ─────────────────── -->
+  <!-- Card template: rect 620x62 with rx=10, x=40, y varies
+       Title 15px bold · Caption 11px Mono
+       Palette: bg rgba(255,255,255,0.04), stroke rgba(255,255,255,0.10), text #b4b4c0, caption #6c6c78 -->
+
+  <g id="today-cards" font-family="'Outfit','Inter',-apple-system,sans-serif">
+    <!-- Layer 1 — Context window -->
+    <g>
+      <rect x="40" y="188" width="620" height="62" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+      <text x="60" y="214" font-size="15" font-weight="600" fill="#b4b4c0">1. Context window</text>
+      <text x="60" y="235" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#6c6c78">200k–1M tokens · ephemeral · dies on tab close</text>
+    </g>
+    <!-- Layer 2 — CLAUDE.md hierarchy -->
+    <g>
+      <rect x="40" y="260" width="620" height="62" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+      <text x="60" y="286" font-size="15" font-weight="600" fill="#b4b4c0">2. CLAUDE.md hierarchy</text>
+      <text x="60" y="307" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#6c6c78">~/.claude/CLAUDE.md → ./CLAUDE.md → ./CLAUDE.local.md · @imports · .claude/rules/*.md</text>
+    </g>
+    <!-- Layer 3 — Skills -->
+    <g>
+      <rect x="40" y="332" width="620" height="62" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+      <text x="60" y="358" font-size="15" font-weight="600" fill="#b4b4c0">3. Skills</text>
+      <text x="60" y="379" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#6c6c78">.claude/skills/&lt;name&gt;/SKILL.md · activation-based instruction bundles</text>
+    </g>
+    <!-- Layer 4 — Subagents -->
+    <g>
+      <rect x="40" y="404" width="620" height="62" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+      <text x="60" y="430" font-size="15" font-weight="600" fill="#b4b4c0">4. Subagents</text>
+      <text x="60" y="451" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#6c6c78">.claude/agents/&lt;name&gt;.md · isolated task contexts · scoped toolsets</text>
+    </g>
+    <!-- Layer 5 — Hooks -->
+    <g>
+      <rect x="40" y="476" width="620" height="62" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+      <text x="60" y="502" font-size="15" font-weight="600" fill="#b4b4c0">5. Hooks</text>
+      <text x="60" y="523" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#6c6c78">.claude/settings.json · PreToolUse · PostToolUse · SessionStart · deterministic</text>
+    </g>
+    <!-- Layer 6 — Sessions + checkpoints -->
+    <g>
+      <rect x="40" y="548" width="620" height="62" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+      <text x="60" y="574" font-size="15" font-weight="600" fill="#b4b4c0">6. Sessions + checkpoints</text>
+      <text x="60" y="595" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#6c6c78">*.jsonl transcripts · grep-only · claude --continue / --resume · /rewind</text>
+    </g>
+    <!-- Layer 7 — Third-party memory MCP -->
+    <g>
+      <rect x="40" y="620" width="620" height="62" rx="10" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+      <text x="60" y="646" font-size="15" font-weight="600" fill="#b4b4c0">7. Third-party memory MCP</text>
+      <text x="60" y="667" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#6c6c78">mem0 · Zep · Letta · Engram · MemPalace · cognee · Supermemory · mcp-memory-service</text>
+    </g>
+
+    <!-- Scope summary -->
+    <g transform="translate(40 740)">
+      <text x="0" y="0" font-size="12" font-weight="600" fill="#5b5b63" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" letter-spacing="1.2">SCOPE</text>
+      <text x="0" y="26" font-size="15" fill="#8c8c98" font-weight="400">one user · one machine · one project at a time</text>
+      <text x="0" y="50" font-size="15" fill="#8c8c98" font-weight="400">instructions only (layers 2–5) or SaaS silo (layer 7)</text>
+      <text x="0" y="74" font-size="15" fill="#8c8c98" font-weight="400">nothing shared across your team. nothing shared across your own projects.</text>
+      <text x="0" y="98" font-size="15" fill="#8c8c98" font-weight="400">nothing that outlives a model deprecation.</text>
+    </g>
+  </g>
+
+  <!-- ─── RIGHT column — wellinformed stack ─────────────── -->
+  <!-- Tag palette:
+       unchanged  (stone)     bg rgba(255,255,255,0.03) / stroke rgba(255,255,255,0.10) / text #b4b4c0 / tag #5b5b63
+       augmented  (emerald 1) bg rgba(52,211,153,0.06)  / stroke rgba(52,211,153,0.35) / text #e8eadf / tag #34d399
+       replaced   (emerald 2) bg rgba(52,211,153,0.12)  / stroke #34d399 2px           / text #f7f4ec / tag #34d399
+       NEW        (emerald 3) bg #34d399               / stroke #34d399 2px           / text #0c0c14 / tag #0c0c14/0.75 -->
+
+  <g id="well-cards" font-family="'Outfit','Inter',-apple-system,sans-serif">
+    <!-- 1. Context window — AUGMENTED -->
+    <g>
+      <rect x="720" y="188" width="620" height="62" rx="10" fill="rgba(52,211,153,0.06)" stroke="rgba(52,211,153,0.35)" stroke-width="1"/>
+      <text x="740" y="214" font-size="15" font-weight="600" fill="#e8eadf">1. Context window</text>
+      <text x="740" y="235" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#8c8c98">PreToolUse hook pre-fills top-3 graph hits before Grep/Read/WebSearch</text>
+      <text x="1320" y="212" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="600" fill="#34d399" text-anchor="end" letter-spacing="1">AUGMENTED</text>
+    </g>
+    <!-- 2. CLAUDE.md hierarchy — UNCHANGED -->
+    <g>
+      <rect x="720" y="260" width="620" height="62" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+      <text x="740" y="286" font-size="15" font-weight="600" fill="#b4b4c0">2. CLAUDE.md hierarchy</text>
+      <text x="740" y="307" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#6c6c78">left alone · complementary (instructions, not retrieval)</text>
+      <text x="1320" y="284" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="600" fill="#5b5b63" text-anchor="end" letter-spacing="1">UNCHANGED</text>
+    </g>
+    <!-- 3. Skills — UNCHANGED -->
+    <g>
+      <rect x="720" y="332" width="620" height="62" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+      <text x="740" y="358" font-size="15" font-weight="600" fill="#b4b4c0">3. Skills</text>
+      <text x="740" y="379" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#6c6c78">left alone · complementary (instructions, not retrieval)</text>
+      <text x="1320" y="356" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="600" fill="#5b5b63" text-anchor="end" letter-spacing="1">UNCHANGED</text>
+    </g>
+    <!-- 4. Subagents — UNCHANGED -->
+    <g>
+      <rect x="720" y="404" width="620" height="62" rx="10" fill="rgba(255,255,255,0.03)" stroke="rgba(255,255,255,0.10)" stroke-width="1"/>
+      <text x="740" y="430" font-size="15" font-weight="600" fill="#b4b4c0">4. Subagents</text>
+      <text x="740" y="451" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#6c6c78">left alone · orthogonal mechanism</text>
+      <text x="1320" y="428" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="600" fill="#5b5b63" text-anchor="end" letter-spacing="1">UNCHANGED</text>
+    </g>
+    <!-- 5. Hooks — EXTENDED -->
+    <g>
+      <rect x="720" y="476" width="620" height="62" rx="10" fill="rgba(52,211,153,0.06)" stroke="rgba(52,211,153,0.35)" stroke-width="1"/>
+      <text x="740" y="502" font-size="15" font-weight="600" fill="#e8eadf">5. Hooks</text>
+      <text x="740" y="523" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#8c8c98">PreToolUse · wellinformed ask --json · PostToolUse · auto-save to research room</text>
+      <text x="1320" y="500" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="600" fill="#34d399" text-anchor="end" letter-spacing="1">EXTENDED</text>
+    </g>
+    <!-- 6. Sessions + checkpoints — WRAPPED -->
+    <g>
+      <rect x="720" y="548" width="620" height="62" rx="10" fill="rgba(52,211,153,0.06)" stroke="rgba(52,211,153,0.35)" stroke-width="1"/>
+      <text x="740" y="574" font-size="15" font-weight="600" fill="#e8eadf">6. Sessions + checkpoints</text>
+      <text x="740" y="595" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#8c8c98">vector-indexed into sessions room · semantic ask across every past project</text>
+      <text x="1320" y="572" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="600" fill="#34d399" text-anchor="end" letter-spacing="1">WRAPPED</text>
+    </g>
+    <!-- 7. Memory MCP — REPLACED -->
+    <g>
+      <rect x="720" y="620" width="620" height="62" rx="10" fill="rgba(52,211,153,0.14)" stroke="#34d399" stroke-width="2"/>
+      <text x="740" y="646" font-size="15" font-weight="700" fill="#f7f4ec">7. Memory MCP server</text>
+      <text x="740" y="667" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="#b4b4c0">wellinformed · 21 tools · MIT · local · measured 75.22% NDCG@10</text>
+      <text x="1320" y="644" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="700" fill="#34d399" text-anchor="end" letter-spacing="1">REPLACED</text>
+    </g>
+
+    <!-- NEW LAYERS — 8-13 -->
+    <!-- 8. Per-repo rooms -->
+    <g>
+      <rect x="720" y="692" width="620" height="62" rx="10" fill="#34d399" stroke="#34d399" stroke-width="2"/>
+      <text x="740" y="718" font-size="15" font-weight="700" fill="#0c0c14">8. Per-repo rooms</text>
+      <text x="740" y="739" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="rgba(12,12,20,0.75)">one room per codebase · auto-provisioned · zero cross-project bleed</text>
+      <text x="1320" y="716" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="700" fill="rgba(12,12,20,0.8)" text-anchor="end" letter-spacing="1">NEW</text>
+    </g>
+    <!-- 9. Three system rooms -->
+    <g>
+      <rect x="720" y="764" width="620" height="62" rx="10" fill="#34d399" stroke="#34d399" stroke-width="2"/>
+      <text x="740" y="790" font-size="15" font-weight="700" fill="#0c0c14">9. Three system rooms</text>
+      <text x="740" y="811" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="rgba(12,12,20,0.75)">toolshed · research · oracle · always-on · virtual membership by source_uri</text>
+      <text x="1320" y="788" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="700" fill="rgba(12,12,20,0.8)" text-anchor="end" letter-spacing="1">NEW</text>
+    </g>
+    <!-- 10. libp2p federation -->
+    <g>
+      <rect x="720" y="836" width="620" height="62" rx="10" fill="#34d399" stroke="#34d399" stroke-width="2"/>
+      <text x="740" y="862" font-size="15" font-weight="700" fill="#0c0c14">10. libp2p federation</text>
+      <text x="740" y="883" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="rgba(12,12,20,0.75)">ask --peers · each peer carries a shard of what's current · Noise + ed25519</text>
+      <text x="1320" y="860" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="700" fill="rgba(12,12,20,0.8)" text-anchor="end" letter-spacing="1">NEW</text>
+    </g>
+    <!-- 11. did:key identity -->
+    <g>
+      <rect x="720" y="908" width="620" height="62" rx="10" fill="#34d399" stroke="#34d399" stroke-width="2"/>
+      <text x="740" y="934" font-size="15" font-weight="700" fill="#0c0c14">11. W3C did:key identity</text>
+      <text x="740" y="955" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="rgba(12,12,20,0.75)">Ed25519 on first boot · BIP39 recovery · offline-verifiable signed envelopes</text>
+      <text x="1320" y="932" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="700" fill="rgba(12,12,20,0.8)" text-anchor="end" letter-spacing="1">NEW</text>
+    </g>
+    <!-- 12. Tree-sitter code graph -->
+    <g>
+      <rect x="720" y="980" width="620" height="62" rx="10" fill="#34d399" stroke="#34d399" stroke-width="2"/>
+      <text x="740" y="1006" font-size="15" font-weight="700" fill="#0c0c14">12. Tree-sitter code graph</text>
+      <text x="740" y="1027" font-size="11" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" fill="rgba(12,12,20,0.75)">9 node kinds · 5 edge kinds · structural search · code_graph_query MCP tool</text>
+      <text x="1320" y="1004" font-size="10" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-weight="700" fill="rgba(12,12,20,0.8)" text-anchor="end" letter-spacing="1">NEW</text>
+    </g>
+  </g>
+
+  <!-- ─── bottom takeaway + legend ──────────────────────── -->
+  <g transform="translate(0 1070)">
+    <g transform="translate(40 0)" font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-size="11">
+      <!-- legend swatches -->
+      <rect x="0" y="-14" width="20" height="14" rx="3" fill="rgba(255,255,255,0.04)" stroke="rgba(255,255,255,0.10)"/>
+      <text x="28" y="-3" fill="#8c8c98">unchanged</text>
+      <rect x="112" y="-14" width="20" height="14" rx="3" fill="rgba(52,211,153,0.06)" stroke="rgba(52,211,153,0.35)"/>
+      <text x="140" y="-3" fill="#8c8c98">augmented / extended / wrapped</text>
+      <rect x="344" y="-14" width="20" height="14" rx="3" fill="rgba(52,211,153,0.14)" stroke="#34d399" stroke-width="1.5"/>
+      <text x="372" y="-3" fill="#8c8c98">replaced</text>
+      <rect x="444" y="-14" width="20" height="14" rx="3" fill="#34d399" stroke="#34d399" stroke-width="1.5"/>
+      <text x="472" y="-3" fill="#8c8c98">new capability</text>
+    </g>
+    <text x="1360" y="-3" text-anchor="end"
+          font-family="'JetBrains Mono','SF Mono','Menlo',monospace" font-size="11" fill="#5b5b63">
+      source: code.claude.com/docs/en/best-practices · github.com/SaharBarak/wellinformed
+    </text>
+  </g>
+</svg>
