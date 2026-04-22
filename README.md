@@ -14,7 +14,7 @@
   <img src="docs/demo.gif" alt="wellinformed CLI demo — peer identity, graph breadth, cross-source ask, federated ask, Claude Code wiring" width="880" />
 </p>
 
-**wellinformed is a peer-to-peer shared knowledge network that enables continuous shared learning across machines.** Every one of us holds a shard of knowledge; together, we create knowledge planes — always up-to-date, everlasting, globally accessible, at lightning speed. **No servers. No subscriptions.** Before your coding agent burns 30 minutes on the same web search your teammate already did yesterday, it asks your network — your code, your dependencies, your research, your teammates' graphs — all federated over libp2p with a cryptographic identity you own. Local-first. CPU-only. Zero cloud, zero telemetry.
+**wellinformed is a peer-to-peer shared knowledge network that enables continuous shared learning across machines.** Every one of us holds a shard of knowledge; together, we create knowledge planes — always up-to-date, everlasting, globally accessible, at lightning speed. **No servers. No subscriptions.** Before your coding agent burns 30 minutes on the same web search your teammate already did yesterday, it asks your network — if someone ingested a knowledge that relevent to you, you'll get in under 500ms — all federated over libp2p with a cryptographic identity you own. Local-first. CPU-only. Zero cloud, zero telemetry.
 
 ```
 $ wellinformed ask "vector search sqlite" --k 3
@@ -28,8 +28,6 @@ $ wellinformed ask "vector search sqlite" --k 3
 ## CLAUDE.md project instructions     (your research notes)
    distance: 1.173 | room: auto-tlv
 ```
-
-One query. Three rooms. A starred GitHub repo, your Go source, and your own Claude-session notes — all retrieved in 970 ms, CPU-only, no network call.
 
 <p align="center">
   <b>75.22% NDCG@10 on BEIR SciFact</b> &nbsp;·&nbsp; CPU-only &nbsp;·&nbsp; 11 ms p50 &nbsp;·&nbsp;
